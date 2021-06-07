@@ -1,11 +1,21 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: "Coverage commentator"
+description: "Comment test coverage to PR"
+author: "kuju63"
 inputs:
-  milliseconds: # change this
+  token:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: "Set GitHub Token for comment to PR"
+  paths:
+    required: true
+    description: "Coverage file path. Ex. coverage/**/*.xml "
+  type:
+    required: false
+    description: "Coverage file format"
+    default: "cobetura"
+  debug:
+    required: false
+    description: "Debug mode"
+    default: "0"
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: "node12"
+  main: "dist/index.js"
