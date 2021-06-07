@@ -7,5 +7,11 @@ module.exports = {
   transform: {
     '^.+\\.ts$': 'ts-jest'
   },
-  verbose: true
+  verbose: true,
+  coverageReporters: [
+    "lcov",
+    "clover",
+    "cobertura",
+    "json"
+  ]
 }
