@@ -11,7 +11,7 @@ inputs:
   type:
     required: false
     description: "Coverage file format"
-    default: "cobetura"
+    default: "cobertura"
   debug:
     required: false
     description: "Debug mode"

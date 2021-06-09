@@ -1,5 +1,5 @@
-import { mocked } from 'ts-jest/utils'
-import { CobeturaParser } from '../src/parser/CobeturaParser'
+import {mocked} from 'ts-jest/utils'
+import {CoberturaParser} from '../src/parser/CoberturaParser'
 import fs from 'fs'
 import * as core from '@actions/core'
 
@@ -18,7 +18,7 @@ afterEach(() => {
 describe('Test CobeturaParser', () => {
   it('File does not exist return null', () => {
     fsExists.mockImplementation(_ => false)
-    const target = new CobeturaParser()
+    const target = new CoberturaParser()
     const actual = target.parse('sample.xml')
     expect(actual).toBeUndefined()
   })
@@ -79,7 +79,7 @@ describe('Test CobeturaParser', () => {
         </packages>
       </coverage>`)
     })
-    const target = new CobeturaParser()
+    const target = new CoberturaParser()
     const actual = target.parse('sample.xml')
     expect(coreDebug.mock.calls[0]).toEqual(['Array'])
     expect(actual).toStrictEqual({
@@ -176,7 +176,7 @@ describe('Test CobeturaParser', () => {
         </packages>
       </coverage>`)
     })
-    const target = new CobeturaParser()
+    const target = new CoberturaParser()
     const actual = target.parse('sample.xml')
     expect(coreDebug.mock.calls[0]).toEqual(['Object'])
     expect(actual).toStrictEqual({
