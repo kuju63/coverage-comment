@@ -13,7 +13,7 @@ const branchesValidAttr = '@_branches-valid'
 const complexityAttr = '@_complexity'
 const signatureAttr = '@_signature'
 
-export class CobeturaParser implements IParser {
+export class CoberturaParser implements IParser {
   parse(path: string): CoverageEntity | undefined {
     if (!fs.existsSync(path)) {
       return
