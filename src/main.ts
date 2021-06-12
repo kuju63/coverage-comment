@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import * as glob from '@actions/glob'
+import * as github from '@actions/github'
 import {CoberturaParser} from './parser/CoberturaParser'
 
 const types = ['cobertura']
@@ -28,12 +29,29 @@ async function run(): Promise<void> {
       totalModuleCount++
     }
     if (totalModuleCount > 0) {
-      core.debug(
-        `Total line covered ${(totalLineRate / totalModuleCount) * 100}`
-      )
-      core.debug(
-        `Total branch covered ${(totalBranchRate / totalModuleCount) * 100}`
-      )
+      const averageLineRate = (totalLineRate / totalModuleCount) * 100
+      const averageBranchRate = (totalBranchRate / totalModuleCount) * 100
+      core.debug(`Total line covered ${averageLineRate}`)
+      core.debug(`Total branch covered ${averageBranchRate}`)
+
+      const pullRequest = github.context.payload['pull_request']
+      if (pullRequest?.number) {
+        const octokit = github.getOctokit(token)
+        await octokit.rest.pulls.createReviewComment({
+          owner: github.context.repo.owner,
+          repo: github.context.repo.repo,
+          pull_number: pullRequest.number,
+          body: `## Coverage Report
+          | Line rate (avg) | Branch rate (avg) |
+          | --------------- | ----------------- |
+          | ${averageLineRate} | ${averageBranchRate} |
+          `
+        })
+      } else {
+        if (!debug) {
+          core.setFailed('Pull Request event only.')
+        }
+      }
     } else {
       core.warning('Coverage file does not found.')
     }
