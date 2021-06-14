@@ -21,6 +21,7 @@ async function run(): Promise<void> {
     let totalLineRate = 0.0
     let totalBranchRate = 0.0
     for await (const file of globber.globGenerator()) {
+      core.info(`load coverage file ${file}`)
       const coverage = parser.parse(file)
       if (coverage) {
         totalLineRate += coverage.lineRate
@@ -37,15 +38,14 @@ async function run(): Promise<void> {
       const pullRequest = github.context.payload['pull_request']
       if (pullRequest?.number) {
         const octokit = github.getOctokit(token)
-        await octokit.rest.pulls.createReviewComment({
+        await octokit.rest.issues.createComment({
           owner: github.context.repo.owner,
           repo: github.context.repo.repo,
-          pull_number: pullRequest.number,
+          issue_number: pullRequest.number,
           body: `## Coverage Report
-          | Line rate (avg) | Branch rate (avg) |
-          | --------------- | ----------------- |
-          | ${averageLineRate} | ${averageBranchRate} |
-          `
+| Line rate (avg) | Branch rate (avg) |
+| --------------- | ----------------- |
+| ${averageLineRate}% | ${averageBranchRate}% |`
         })
       } else {
         if (!debug) {

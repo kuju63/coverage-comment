@@ -65,6 +65,7 @@ function run() {
             try {
                 for (var _b = __asyncValues(globber.globGenerator()), _c; _c = yield _b.next(), !_c.done;) {
                     const file = _c.value;
+                    core.info(`load coverage file ${file}`);
                     const coverage = parser.parse(file);
                     if (coverage) {
                         totalLineRate += coverage.lineRate;
@@ -88,15 +89,14 @@ function run() {
                 const pullRequest = github.context.payload['pull_request'];
                 if (pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.number) {
                     const octokit = github.getOctokit(token);
-                    yield octokit.rest.pulls.createReviewComment({
+                    yield octokit.rest.issues.createComment({
                         owner: github.context.repo.owner,
                         repo: github.context.repo.repo,
-                        pull_number: pullRequest.number,
+                        issue_number: pullRequest.number,
                         body: `## Coverage Report
-          | Line rate (avg) | Branch rate (avg) |
-          | --------------- | ----------------- |
-          | ${averageLineRate} | ${averageBranchRate} |
-          `
+| Line rate (avg) | Branch rate (avg) |
+| --------------- | ----------------- |
+| ${averageLineRate}% | ${averageBranchRate}% |`
                     });
                 }
                 else {
