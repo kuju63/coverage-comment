@@ -43,10 +43,9 @@ async function run(): Promise<void> {
           repo: github.context.repo.repo,
           issue_number: pullRequest.number,
           body: `## Coverage Report
-          | Line rate (avg) | Branch rate (avg) |
-          | --------------- | ----------------- |
-          | ${averageLineRate}% | ${averageBranchRate}% |
-          `
+| Line rate (avg) | Branch rate (avg) |
+| --------------- | ----------------- |
+| ${averageLineRate}% | ${averageBranchRate}% |`
         })
       } else {
         if (!debug) {
