@@ -65,6 +65,7 @@ function run() {
             try {
                 for (var _b = __asyncValues(globber.globGenerator()), _c; _c = yield _b.next(), !_c.done;) {
                     const file = _c.value;
+                    core.info(`load coverage file ${file}`);
                     const coverage = parser.parse(file);
                     if (coverage) {
                         totalLineRate += coverage.lineRate;

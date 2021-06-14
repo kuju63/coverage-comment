@@ -21,6 +21,7 @@ async function run(): Promise<void> {
     let totalLineRate = 0.0
     let totalBranchRate = 0.0
     for await (const file of globber.globGenerator()) {
+      core.info(`load coverage file ${file}`)
       const coverage = parser.parse(file)
       if (coverage) {
         totalLineRate += coverage.lineRate
