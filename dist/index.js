@@ -144,10 +144,10 @@ function run() {
                 const pullRequest = github.context.payload['pull_request'];
                 if (pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.number) {
                     const octokit = github.getOctokit(token);
-                    yield octokit.rest.pulls.createReviewComment({
+                    yield octokit.rest.issues.createComment({
                         owner: github.context.repo.owner,
                         repo: github.context.repo.repo,
-                        pull_number: pullRequest.number,
+                        issue_number: pullRequest.number,
                         body: builder.toString()
                     });
                 }
