@@ -2,6 +2,8 @@ import * as core from '@actions/core'
 import * as glob from '@actions/glob'
 import * as github from '@actions/github'
 import {CoberturaParser} from './parser/CoberturaParser'
+import {MessageBuilder} from './MessageBuilder'
+import path from 'path'
 
 const types = ['cobertura']
 
@@ -17,12 +19,19 @@ async function run(): Promise<void> {
 
     const globber = await glob.create(paths)
     const parser = new CoberturaParser()
+    const builder = new MessageBuilder('## Coverage Report')
     let totalModuleCount = 0
     let totalLineRate = 0.0
     let totalBranchRate = 0.0
     for await (const file of globber.globGenerator()) {
       const coverage = parser.parse(file)
       if (coverage) {
+        const moduleName = path.basename(file, path.extname(file))
+        builder.appendCoverage(
+          moduleName,
+          coverage.lineRate * 100,
+          coverage.branchRate * 100
+        )
         totalLineRate += coverage.lineRate
         totalBranchRate += coverage.branchRate
       }
@@ -34,6 +43,8 @@ async function run(): Promise<void> {
       core.debug(`Total line covered ${averageLineRate}`)
       core.debug(`Total branch covered ${averageBranchRate}`)
 
+      builder.appendCoverage('Total', averageLineRate, averageBranchRate)
+
       const pullRequest = github.context.payload['pull_request']
       if (pullRequest?.number) {
         const octokit = github.getOctokit(token)
@@ -41,11 +52,7 @@ async function run(): Promise<void> {
           owner: github.context.repo.owner,
           repo: github.context.repo.repo,
           pull_number: pullRequest.number,
-          body: `## Coverage Report
-          | Line rate (avg) | Branch rate (avg) |
-          | --------------- | ----------------- |
-          | ${averageLineRate} | ${averageBranchRate} |
-          `
+          body: builder.toString()
         })
       } else {
         if (!debug) {
