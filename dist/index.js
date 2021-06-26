@@ -1,6 +1,53 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 8449:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.MessageBuilder = void 0;
+/**
+ * Builder of generate output message
+ */
+class MessageBuilder {
+    /**
+     * Initialize instance of MessageBuilder class.
+     * @param header Message header
+     */
+    constructor(header) {
+        this.msg = [];
+        this.msg.push(header);
+        this.msg.push('| Module Name | Line rate (avg) | Branch rate (avg) |');
+        this.msg.push('| :---------- | --------------: | ----------------: |');
+    }
+    /**
+     * Append coverage info
+     * @param name Module name
+     * @param lineCoverage line coverage value
+     * @param branchCoverage branch coverage value
+     * @returns Builder object
+     */
+    appendCoverage(name, lineCoverage, branchCoverage) {
+        const lineMsg = [];
+        lineMsg.push(name, lineCoverage.toString(), branchCoverage.toString());
+        this.msg.push(`| ${lineMsg.join(' | ')} |`);
+        return this;
+    }
+    /**
+     * Return message string
+     * @returns Message string
+     */
+    toString() {
+        return this.msg.join('\n');
+    }
+}
+exports.MessageBuilder = MessageBuilder;
+
+
+/***/ }),
+
 /***/ 3109:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -46,6 +93,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const glob = __importStar(__nccwpck_require__(8090));
 const github = __importStar(__nccwpck_require__(5438));
 const CoberturaParser_1 = __nccwpck_require__(7266);
+const MessageBuilder_1 = __nccwpck_require__(8449);
 const types = ['cobertura'];
 function run() {
     var e_1, _a;
@@ -59,6 +107,7 @@ function run() {
             guardToken(token);
             const globber = yield glob.create(paths);
             const parser = new CoberturaParser_1.CoberturaParser();
+            const builder = new MessageBuilder_1.MessageBuilder('## Coverage Report');
             let totalModuleCount = 0;
             let totalLineRate = 0.0;
             let totalBranchRate = 0.0;
@@ -68,6 +117,11 @@ function run() {
                     core.info(`load coverage file ${file}`);
                     const coverage = parser.parse(file);
                     if (coverage) {
+                        if (coverage.objectCoverages) {
+                            for (const obj of coverage.objectCoverages) {
+                                builder.appendCoverage(obj.name, obj.lineRate * 100, obj.branchRate * 100);
+                            }
+                        }
                         totalLineRate += coverage.lineRate;
                         totalBranchRate += coverage.branchRate;
                     }
@@ -86,6 +140,7 @@ function run() {
                 const averageBranchRate = (totalBranchRate / totalModuleCount) * 100;
                 core.debug(`Total line covered ${averageLineRate}`);
                 core.debug(`Total branch covered ${averageBranchRate}`);
+                builder.appendCoverage('Total', averageLineRate, averageBranchRate);
                 const pullRequest = github.context.payload['pull_request'];
                 if (pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.number) {
                     const octokit = github.getOctokit(token);
@@ -93,10 +148,7 @@ function run() {
                         owner: github.context.repo.owner,
                         repo: github.context.repo.repo,
                         issue_number: pullRequest.number,
-                        body: `## Coverage Report
-| Line rate (avg) | Branch rate (avg) |
-| --------------- | ----------------- |
-| ${averageLineRate}% | ${averageBranchRate}% |`
+                        body: builder.toString()
                     });
                 }
                 else {
