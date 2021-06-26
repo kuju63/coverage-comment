@@ -88,16 +88,12 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const glob = __importStar(__nccwpck_require__(8090));
 const github = __importStar(__nccwpck_require__(5438));
 const CoberturaParser_1 = __nccwpck_require__(7266);
 const MessageBuilder_1 = __nccwpck_require__(8449);
-const path_1 = __importDefault(__nccwpck_require__(5622));
 const types = ['cobertura'];
 function run() {
     var e_1, _a;
@@ -120,8 +116,11 @@ function run() {
                     const file = _c.value;
                     const coverage = parser.parse(file);
                     if (coverage) {
-                        const moduleName = path_1.default.basename(file, path_1.default.extname(file));
-                        builder.appendCoverage(moduleName, coverage.lineRate * 100, coverage.branchRate * 100);
+                        if (coverage.objectCoverages) {
+                            for (const obj of coverage.objectCoverages) {
+                                builder.appendCoverage(obj.name, obj.lineRate * 100, obj.branchRate * 100);
+                            }
+                        }
                         totalLineRate += coverage.lineRate;
                         totalBranchRate += coverage.branchRate;
                     }

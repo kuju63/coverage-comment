@@ -3,7 +3,6 @@ import * as glob from '@actions/glob'
 import * as github from '@actions/github'
 import {CoberturaParser} from './parser/CoberturaParser'
 import {MessageBuilder} from './MessageBuilder'
-import path from 'path'
 
 const types = ['cobertura']
 
@@ -26,12 +25,15 @@ async function run(): Promise<void> {
     for await (const file of globber.globGenerator()) {
       const coverage = parser.parse(file)
       if (coverage) {
-        const moduleName = path.basename(file, path.extname(file))
-        builder.appendCoverage(
-          moduleName,
-          coverage.lineRate * 100,
-          coverage.branchRate * 100
-        )
+        if (coverage.objectCoverages) {
+          for (const obj of coverage.objectCoverages) {
+            builder.appendCoverage(
+              obj.name,
+              obj.lineRate * 100,
+              obj.branchRate * 100
+            )
+          }
+        }
         totalLineRate += coverage.lineRate
         totalBranchRate += coverage.branchRate
       }
