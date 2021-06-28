@@ -25,3 +25,37 @@
 None
 
 ## How to use
+
+### Simple using
+
+```yaml
+- uses: actions/checkout@v2
+  with:
+    repository: kuju63/coverage-comment
+    token: ${{ secrets.TOKEN }}
+    ref: v1
+    path: ${{ github.workspace }}/.github/actions
+- name: Test coverage
+  uses: ./.github/actions
+  with:
+    token: ${{ github.token }}
+    paths: csharp/test/Sample.Tests/TestResults/**/coverage.cobertura.xml
+```
+
+### Full using
+
+```yaml
+- uses: actions/checkout@v2
+  with:
+    repository: kuju63/coverage-comment
+    token: ${{ secrets.TOKEN }}
+    ref: v1
+    path: ${{ github.workspace }}/.github/actions
+- name: Test coverage
+  uses: ./.github/actions
+  with:
+    token: ${{ github.token }}
+    paths: csharp/test/Sample.Tests/TestResults/**/coverage.cobertura.xml
+    type: 'cobertura'
+    debug: '0'
+```
