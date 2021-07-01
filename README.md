@@ -29,14 +29,8 @@ None
 ### Simple using
 
 ```yaml
-- uses: actions/checkout@v2
-  with:
-    repository: kuju63/coverage-comment
-    token: ${{ secrets.TOKEN }}
-    ref: v1
-    path: ${{ github.workspace }}/.github/actions
 - name: Test coverage
-  uses: ./.github/actions
+  uses: kuju63/coverage-comment
   with:
     token: ${{ github.token }}
     paths: csharp/test/Sample.Tests/TestResults/**/coverage.cobertura.xml
@@ -45,14 +39,8 @@ None
 ### Full using
 
 ```yaml
-- uses: actions/checkout@v2
-  with:
-    repository: kuju63/coverage-comment
-    token: ${{ secrets.TOKEN }}
-    ref: v1
-    path: ${{ github.workspace }}/.github/actions
 - name: Test coverage
-  uses: ./.github/actions
+  uses: kuju63/coverage-comment
   with:
     token: ${{ github.token }}
     paths: csharp/test/Sample.Tests/TestResults/**/coverage.cobertura.xml
