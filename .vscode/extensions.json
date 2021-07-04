@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+        "esbenp.prettier-vscode",
+        "streetsidesoftware.code-spell-checker",
+        "ryanluker.vscode-coverage-gutters",
+        "visualstudioexptteam.vscodeintellicode",
+        "editorconfig.editorconfig",
+        "dbaeumer.vscode-eslint",
+        "orta.vscode-jest",
+        "kavod-io.vscode-jest-test-adapter"
+    ]
+}
