@@ -10,24 +10,37 @@ export class MessageBuilder {
    */
   constructor(header: string) {
     this.msg.push(header)
-    this.msg.push('| Module Name | Line rate (avg) | Branch rate (avg) |')
-    this.msg.push('| :---------- | --------------: | ----------------: |')
+    this.msg.push(
+      '| Package Name | Class Name | Method Name | Line rate (avg) | Branch rate (avg) |'
+    )
+    this.msg.push(
+      '| :---------- | ---------- | ------------ | --------------: | ----------------: |'
+    )
   }
 
   /**
    * Append coverage info
    * @param name Module name
+   * @param className Class name
+   * @param methodName Method name
    * @param lineCoverage line coverage value
    * @param branchCoverage branch coverage value
    * @returns Builder object
    */
   appendCoverage(
     name: string,
+    className: string,
+    methodName: string,
     lineCoverage: number,
     branchCoverage: number
   ): MessageBuilder {
-    const lineMsg: string[] = []
-    lineMsg.push(name, lineCoverage.toString(), branchCoverage.toString())
+    const lineMsg: string[] = [
+      name,
+      className,
+      methodName,
+      lineCoverage.toString(),
+      branchCoverage.toString()
+    ]
 
     this.msg.push(`| ${lineMsg.join(' | ')} |`)
 
