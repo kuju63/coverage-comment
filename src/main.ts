@@ -3,6 +3,7 @@ import * as glob from '@actions/glob'
 import * as github from '@actions/github'
 import {CoberturaParser} from './parser/CoberturaParser'
 import {MessageBuilder} from './MessageBuilder'
+import {MethodEntity, ObjectEntity} from './parser/IParser'
 
 const types = ['cobertura']
 
@@ -30,8 +31,17 @@ async function run(): Promise<void> {
           for (const obj of coverage.objectCoverages) {
             builder.appendCoverage(
               obj.name,
+              '',
+              '',
               obj.lineRate * 100,
               obj.branchRate * 100
+            )
+            appendClassCoverage(
+              builder,
+              obj.name,
+              '',
+              obj.objectCoverages,
+              obj.methodCoverages
             )
           }
         }
@@ -46,7 +56,13 @@ async function run(): Promise<void> {
       core.debug(`Total line covered ${averageLineRate}`)
       core.debug(`Total branch covered ${averageBranchRate}`)
 
-      builder.appendCoverage('Total', averageLineRate, averageBranchRate)
+      builder.appendCoverage(
+        'Total',
+        '',
+        '',
+        averageLineRate,
+        averageBranchRate
+      )
 
       const pullRequest = github.context.payload['pull_request']
       if (pullRequest?.number) {
@@ -79,6 +95,44 @@ function guardCoverageType(type: string): void {
 function guardToken(token: string): void {
   if (!token) {
     core.setFailed('token is required')
+  }
+}
+
+function appendClassCoverage(
+  builder: MessageBuilder,
+  moduleName: string,
+  className: string,
+  objects: ObjectEntity[] | undefined,
+  methods: MethodEntity[] | undefined
+): void {
+  if (methods) {
+    for (const method of methods) {
+      builder.appendCoverage(
+        moduleName,
+        className,
+        method.name,
+        method.lineRate * 100,
+        method.branchRate * 100
+      )
+    }
+  }
+  if (objects) {
+    for (const obj of objects) {
+      builder.appendCoverage(
+        moduleName,
+        obj.name,
+        '',
+        obj.lineRate * 100,
+        obj.branchRate * 100
+      )
+      appendClassCoverage(
+        builder,
+        moduleName,
+        obj.name,
+        obj.objectCoverages,
+        obj.methodCoverages
+      )
+    }
   }
 }
 

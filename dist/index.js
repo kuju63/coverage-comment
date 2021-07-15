@@ -19,19 +19,26 @@ class MessageBuilder {
     constructor(header) {
         this.msg = [];
         this.msg.push(header);
-        this.msg.push('| Module Name | Line rate (avg) | Branch rate (avg) |');
-        this.msg.push('| :---------- | --------------: | ----------------: |');
+        this.msg.push('| Package Name | Class Name | Method Name | Line rate (avg) | Branch rate (avg) |');
+        this.msg.push('| :---------- | ---------- | ------------ | --------------: | ----------------: |');
     }
     /**
      * Append coverage info
      * @param name Module name
+     * @param className Class name
+     * @param methodName Method name
      * @param lineCoverage line coverage value
      * @param branchCoverage branch coverage value
      * @returns Builder object
      */
-    appendCoverage(name, lineCoverage, branchCoverage) {
-        const lineMsg = [];
-        lineMsg.push(name, lineCoverage.toString(), branchCoverage.toString());
+    appendCoverage(name, className, methodName, lineCoverage, branchCoverage) {
+        const lineMsg = [
+            name,
+            className,
+            methodName,
+            lineCoverage.toString(),
+            branchCoverage.toString()
+        ];
         this.msg.push(`| ${lineMsg.join(' | ')} |`);
         return this;
     }
@@ -119,7 +126,8 @@ function run() {
                     if (coverage) {
                         if (coverage.objectCoverages) {
                             for (const obj of coverage.objectCoverages) {
-                                builder.appendCoverage(obj.name, obj.lineRate * 100, obj.branchRate * 100);
+                                builder.appendCoverage(obj.name, '', '', obj.lineRate * 100, obj.branchRate * 100);
+                                appendClassCoverage(builder, obj.name, '', obj.objectCoverages, obj.methodCoverages);
                             }
                         }
                         totalLineRate += coverage.lineRate;
@@ -140,7 +148,7 @@ function run() {
                 const averageBranchRate = (totalBranchRate / totalModuleCount) * 100;
                 core.debug(`Total line covered ${averageLineRate}`);
                 core.debug(`Total branch covered ${averageBranchRate}`);
-                builder.appendCoverage('Total', averageLineRate, averageBranchRate);
+                builder.appendCoverage('Total', '', '', averageLineRate, averageBranchRate);
                 const pullRequest = github.context.payload['pull_request'];
                 if (pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.number) {
                     const octokit = github.getOctokit(token);
@@ -174,6 +182,19 @@ function guardCoverageType(type) {
 function guardToken(token) {
     if (!token) {
         core.setFailed('token is required');
+    }
+}
+function appendClassCoverage(builder, moduleName, className, objects, methods) {
+    if (methods) {
+        for (const method of methods) {
+            builder.appendCoverage(moduleName, className, method.name, method.lineRate * 100, method.branchRate * 100);
+        }
+    }
+    if (objects) {
+        for (const obj of objects) {
+            builder.appendCoverage(moduleName, obj.name, '', obj.lineRate * 100, obj.branchRate * 100);
+            appendClassCoverage(builder, moduleName, obj.name, obj.objectCoverages, obj.methodCoverages);
+        }
     }
 }
 run();
