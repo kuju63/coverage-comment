@@ -16,7 +16,9 @@ test('Single line', () => {
     '| Package Name | Class Name | Method Name | Line rate (avg) | Branch rate (avg) |\n' +
     '| :---------- | ---------- | ------------ | --------------: | ----------------: |\n' +
     '| sample |  |  | 22.2 | 33.3 |'
-  expect(builder.appendCoverage('sample', '', '', 22.2, 33.3).toString()).toBe(msg)
+  expect(builder.appendCoverage('sample', '', '', 22.2, 33.3).toString()).toBe(
+    msg
+  )
 })
 
 test('Multiple line', () => {
