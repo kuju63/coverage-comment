@@ -1,60 +1,6 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 8449:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.MessageBuilder = void 0;
-/**
- * Builder of generate output message
- */
-class MessageBuilder {
-    /**
-     * Initialize instance of MessageBuilder class.
-     * @param header Message header
-     */
-    constructor(header) {
-        this.msg = [];
-        this.msg.push(header);
-        this.msg.push('| Package Name | Class Name | Method Name | Line rate (avg) | Branch rate (avg) |');
-        this.msg.push('| :---------- | ---------- | ------------ | --------------: | ----------------: |');
-    }
-    /**
-     * Append coverage info
-     * @param name Module name
-     * @param className Class name
-     * @param methodName Method name
-     * @param lineCoverage line coverage value
-     * @param branchCoverage branch coverage value
-     * @returns Builder object
-     */
-    appendCoverage(name, className, methodName, lineCoverage, branchCoverage) {
-        const lineMsg = [
-            name,
-            className,
-            methodName,
-            lineCoverage.toString(),
-            branchCoverage.toString()
-        ];
-        this.msg.push(`| ${lineMsg.join(' | ')} |`);
-        return this;
-    }
-    /**
-     * Return message string
-     * @returns Message string
-     */
-    toString() {
-        return this.msg.join('\n');
-    }
-}
-exports.MessageBuilder = MessageBuilder;
-
-
-/***/ }),
-
 /***/ 3109:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -99,8 +45,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const glob = __importStar(__nccwpck_require__(8090));
 const github = __importStar(__nccwpck_require__(5438));
-const CoberturaParser_1 = __nccwpck_require__(7266);
-const MessageBuilder_1 = __nccwpck_require__(8449);
+const cobertura_parser_1 = __nccwpck_require__(9827);
+const message_builder_1 = __nccwpck_require__(4012);
 const types = ['cobertura'];
 function run() {
     var e_1, _a;
@@ -113,8 +59,8 @@ function run() {
             guardCoverageType(type);
             guardToken(token);
             const globber = yield glob.create(paths);
-            const parser = new CoberturaParser_1.CoberturaParser();
-            const builder = new MessageBuilder_1.MessageBuilder('## Coverage Report');
+            const parser = new cobertura_parser_1.CoberturaParser();
+            const builder = new message_builder_1.MessageBuilder('## Coverage Report');
             let totalModuleCount = 0;
             let totalLineRate = 0.0;
             let totalBranchRate = 0.0;
@@ -203,7 +149,61 @@ run();
 
 /***/ }),
 
-/***/ 7266:
+/***/ 4012:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.MessageBuilder = void 0;
+/**
+ * Builder of generate output message
+ */
+class MessageBuilder {
+    /**
+     * Initialize instance of MessageBuilder class.
+     * @param header Message header
+     */
+    constructor(header) {
+        this.msg = [];
+        this.msg.push(header);
+        this.msg.push('| Package Name | Class Name | Method Name | Line rate (avg) | Branch rate (avg) |');
+        this.msg.push('| :---------- | ---------- | ------------ | --------------: | ----------------: |');
+    }
+    /**
+     * Append coverage info
+     * @param name Module name
+     * @param className Class name
+     * @param methodName Method name
+     * @param lineCoverage line coverage value
+     * @param branchCoverage branch coverage value
+     * @returns Builder object
+     */
+    appendCoverage(name, className, methodName, lineCoverage, branchCoverage) {
+        const lineMsg = [
+            name,
+            className,
+            methodName,
+            lineCoverage.toString(),
+            branchCoverage.toString()
+        ];
+        this.msg.push(`| ${lineMsg.join(' | ')} |`);
+        return this;
+    }
+    /**
+     * Return message string
+     * @returns Message string
+     */
+    toString() {
+        return this.msg.join('\n');
+    }
+}
+exports.MessageBuilder = MessageBuilder;
+
+
+/***/ }),
+
+/***/ 9827:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -232,9 +232,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CoberturaParser = void 0;
+const core = __importStar(__nccwpck_require__(2186));
 const fs_1 = __importDefault(__nccwpck_require__(5747));
 const fast_xml_parser_1 = __importDefault(__nccwpck_require__(7448));
-const core = __importStar(__nccwpck_require__(2186));
 const nameAttr = '@_name';
 const lineRateAttr = '@_line-rate';
 const branchRateAttr = '@_branch-rate';
