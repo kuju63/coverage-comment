@@ -45,8 +45,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const glob = __importStar(__nccwpck_require__(8090));
 const github = __importStar(__nccwpck_require__(5438));
-const coberturaParser_1 = __nccwpck_require__(8321);
-const messageBuilder_1 = __nccwpck_require__(9053);
+const cobertura_parser_1 = __nccwpck_require__(9827);
+const message_builder_1 = __nccwpck_require__(4012);
 const types = ['cobertura'];
 function run() {
     var e_1, _a;
@@ -59,8 +59,8 @@ function run() {
             guardCoverageType(type);
             guardToken(token);
             const globber = yield glob.create(paths);
-            const parser = new coberturaParser_1.CoberturaParser();
-            const builder = new messageBuilder_1.MessageBuilder('## Coverage Report');
+            const parser = new cobertura_parser_1.CoberturaParser();
+            const builder = new message_builder_1.MessageBuilder('## Coverage Report');
             let totalModuleCount = 0;
             let totalLineRate = 0.0;
             let totalBranchRate = 0.0;
@@ -149,7 +149,7 @@ run();
 
 /***/ }),
 
-/***/ 9053:
+/***/ 4012:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -203,7 +203,7 @@ exports.MessageBuilder = MessageBuilder;
 
 /***/ }),
 
-/***/ 8321:
+/***/ 9827:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -232,9 +232,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CoberturaParser = void 0;
+const core = __importStar(__nccwpck_require__(2186));
 const fs_1 = __importDefault(__nccwpck_require__(5747));
 const fast_xml_parser_1 = __importDefault(__nccwpck_require__(7448));
-const core = __importStar(__nccwpck_require__(2186));
 const nameAttr = '@_name';
 const lineRateAttr = '@_line-rate';
 const branchRateAttr = '@_branch-rate';
