@@ -1,9 +1,9 @@
 import * as core from '@actions/core'
 import * as glob from '@actions/glob'
 import * as github from '@actions/github'
-import {CoberturaParser} from './parser/CoberturaParser'
-import {MessageBuilder} from './MessageBuilder'
-import {MethodEntity, ObjectEntity} from './parser/IParser'
+import {CoberturaParser} from './parser/coberturaParser'
+import {MessageBuilder} from './messageBuilder'
+import {MethodEntity, ObjectEntity} from './parser/coverageParser'
 
 const types = ['cobertura']
 

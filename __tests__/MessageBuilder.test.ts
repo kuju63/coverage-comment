@@ -1,4 +1,4 @@
-import {MessageBuilder} from '../src/MessageBuilder'
+import {MessageBuilder} from '../src/messageBuilder'
 
 test('Header only', () => {
   const builder = new MessageBuilder('Header')
