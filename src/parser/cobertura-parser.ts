@@ -1,12 +1,12 @@
-import fs from 'fs'
-import parser from 'fast-xml-parser'
+import * as core from '@actions/core'
 import {
   CoverageEntity,
   IParser,
   MethodEntity,
   ObjectEntity
-} from './coverageParser'
-import * as core from '@actions/core'
+} from './coverage-parser'
+import fs from 'fs'
+import parser from 'fast-xml-parser'
 
 const nameAttr = '@_name'
 const lineRateAttr = '@_line-rate'

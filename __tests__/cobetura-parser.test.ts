@@ -1,5 +1,5 @@
 import {mocked} from 'ts-jest/utils'
-import {CoberturaParser} from '../src/parser/coberturaParser'
+import {CoberturaParser} from '../src/parser/cobertura-parser'
 import fs from 'fs'
 import * as core from '@actions/core'
 
