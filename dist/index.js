@@ -233,7 +233,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CoberturaParser = void 0;
 const core = __importStar(__nccwpck_require__(2186));
-const fs_1 = __importDefault(__nccwpck_require__(5747));
+const fs_1 = __importDefault(__nccwpck_require__(7147));
 const fast_xml_parser_1 = __importDefault(__nccwpck_require__(7448));
 const nameAttr = '@_name';
 const lineRateAttr = '@_line-rate';
@@ -391,7 +391,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.issue = exports.issueCommand = void 0;
-const os = __importStar(__nccwpck_require__(2087));
+const os = __importStar(__nccwpck_require__(2037));
 const utils_1 = __nccwpck_require__(5278);
 /**
  * Commands
@@ -502,8 +502,8 @@ exports.getIDToken = exports.getState = exports.saveState = exports.group = expo
 const command_1 = __nccwpck_require__(7351);
 const file_command_1 = __nccwpck_require__(717);
 const utils_1 = __nccwpck_require__(5278);
-const os = __importStar(__nccwpck_require__(2087));
-const path = __importStar(__nccwpck_require__(5622));
+const os = __importStar(__nccwpck_require__(2037));
+const path = __importStar(__nccwpck_require__(1017));
 const oidc_utils_1 = __nccwpck_require__(8041);
 /**
  * The code to exit an action
@@ -812,8 +812,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.issueCommand = void 0;
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const fs = __importStar(__nccwpck_require__(5747));
-const os = __importStar(__nccwpck_require__(2087));
+const fs = __importStar(__nccwpck_require__(7147));
+const os = __importStar(__nccwpck_require__(2037));
 const utils_1 = __nccwpck_require__(5278);
 function issueCommand(command, message) {
     const filePath = process.env[`GITHUB_${command}`];
@@ -970,8 +970,8 @@ exports.toCommandProperties = toCommandProperties;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Context = void 0;
-const fs_1 = __nccwpck_require__(5747);
-const os_1 = __nccwpck_require__(2087);
+const fs_1 = __nccwpck_require__(7147);
+const os_1 = __nccwpck_require__(2037);
 class Context {
     /**
      * Hydrate the context from the environment
@@ -1346,9 +1346,9 @@ var __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _ar
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DefaultGlobber = void 0;
 const core = __importStar(__nccwpck_require__(2186));
-const fs = __importStar(__nccwpck_require__(5747));
+const fs = __importStar(__nccwpck_require__(7147));
 const globOptionsHelper = __importStar(__nccwpck_require__(1026));
-const path = __importStar(__nccwpck_require__(5622));
+const path = __importStar(__nccwpck_require__(1017));
 const patternHelper = __importStar(__nccwpck_require__(9005));
 const internal_match_kind_1 = __nccwpck_require__(1063);
 const internal_pattern_1 = __nccwpck_require__(4536);
@@ -1575,12 +1575,12 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.hashFiles = void 0;
-const crypto = __importStar(__nccwpck_require__(6417));
+const crypto = __importStar(__nccwpck_require__(6113));
 const core = __importStar(__nccwpck_require__(2186));
-const fs = __importStar(__nccwpck_require__(5747));
-const stream = __importStar(__nccwpck_require__(2413));
-const util = __importStar(__nccwpck_require__(1669));
-const path = __importStar(__nccwpck_require__(5622));
+const fs = __importStar(__nccwpck_require__(7147));
+const stream = __importStar(__nccwpck_require__(2781));
+const util = __importStar(__nccwpck_require__(3837));
+const path = __importStar(__nccwpck_require__(1017));
 function hashFiles(globber) {
     var e_1, _a;
     var _b;
@@ -1688,8 +1688,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.safeTrimTrailingSeparator = exports.normalizeSeparators = exports.hasRoot = exports.hasAbsoluteRoot = exports.ensureAbsoluteRoot = exports.dirname = void 0;
-const path = __importStar(__nccwpck_require__(5622));
-const assert_1 = __importDefault(__nccwpck_require__(2357));
+const path = __importStar(__nccwpck_require__(1017));
+const assert_1 = __importDefault(__nccwpck_require__(9491));
 const IS_WINDOWS = process.platform === 'win32';
 /**
  * Similar to path.dirname except normalizes the path separators and slightly better handling for Windows UNC paths.
@@ -1893,9 +1893,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Path = void 0;
-const path = __importStar(__nccwpck_require__(5622));
+const path = __importStar(__nccwpck_require__(1017));
 const pathHelper = __importStar(__nccwpck_require__(1849));
-const assert_1 = __importDefault(__nccwpck_require__(2357));
+const assert_1 = __importDefault(__nccwpck_require__(9491));
 const IS_WINDOWS = process.platform === 'win32';
 /**
  * Helper class for parsing paths into segments
@@ -2114,10 +2114,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Pattern = void 0;
-const os = __importStar(__nccwpck_require__(2087));
-const path = __importStar(__nccwpck_require__(5622));
+const os = __importStar(__nccwpck_require__(2037));
+const path = __importStar(__nccwpck_require__(1017));
 const pathHelper = __importStar(__nccwpck_require__(1849));
-const assert_1 = __importDefault(__nccwpck_require__(2357));
+const assert_1 = __importDefault(__nccwpck_require__(9491));
 const minimatch_1 = __nccwpck_require__(3973);
 const internal_match_kind_1 = __nccwpck_require__(1063);
 const internal_path_1 = __nccwpck_require__(6836);
@@ -2437,8 +2437,8 @@ exports.PersonalAccessTokenCredentialHandler = PersonalAccessTokenCredentialHand
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const http = __nccwpck_require__(8605);
-const https = __nccwpck_require__(7211);
+const http = __nccwpck_require__(3685);
+const https = __nccwpck_require__(5687);
 const pm = __nccwpck_require__(6443);
 let tunnel;
 var HttpCodes;
@@ -5955,7 +5955,7 @@ exports.Deprecation = Deprecation;
 "use strict";
 
 //parse Empty Node as self closing node
-const buildOptions = __nccwpck_require__(8280).buildOptions;
+const buildOptions = (__nccwpck_require__(8280).buildOptions);
 
 const defaultOptions = {
   attributeNamePrefix: '@_',
@@ -5987,6 +5987,7 @@ const props = [
   'supressEmptyNode',
   'tagValueProcessor',
   'attrValueProcessor',
+  'rootNodeName', //when array as root
 ];
 
 function Parser(options) {
@@ -6008,6 +6009,8 @@ function Parser(options) {
   }
   this.replaceCDATAstr = replaceCDATAstr;
   this.replaceCDATAarr = replaceCDATAarr;
+
+  this.processTextOrObjNode = processTextOrObjNode
 
   if (this.options.format) {
     this.indentate = indentate;
@@ -6034,16 +6037,18 @@ function Parser(options) {
 }
 
 Parser.prototype.parse = function(jObj) {
+  if(Array.isArray(jObj) && this.options.rootNodeName && this.options.rootNodeName.length > 1){
+    jObj = {
+      [this.options.rootNodeName] : jObj
+    }
+  }
   return this.j2x(jObj, 0).val;
 };
 
 Parser.prototype.j2x = function(jObj, level) {
   let attrStr = '';
   let val = '';
-  const keys = Object.keys(jObj);
-  const len = keys.length;
-  for (let i = 0; i < len; i++) {
-    const key = keys[i];
+  for (let key in jObj) {
     if (typeof jObj[key] === 'undefined') {
       // supress undefined node
     } else if (jObj[key] === null) {
@@ -6092,8 +6097,7 @@ Parser.prototype.j2x = function(jObj, level) {
           } else if (item === null) {
             val += this.indentate(level) + '<' + key + '/' + this.tagEndChar;
           } else if (typeof item === 'object') {
-            const result = this.j2x(item, level + 1);
-            val += this.buildObjNode(result.val, key, result.attrStr, level);
+            val += this.processTextOrObjNode(item, key, level)
           } else {
             val += this.buildTextNode(item, key, '', level);
           }
@@ -6108,13 +6112,21 @@ Parser.prototype.j2x = function(jObj, level) {
           attrStr += ' ' + Ks[j] + '="' + this.options.attrValueProcessor('' + jObj[key][Ks[j]]) + '"';
         }
       } else {
-        const result = this.j2x(jObj[key], level + 1);
-        val += this.buildObjNode(result.val, key, result.attrStr, level);
+        val += this.processTextOrObjNode(jObj[key], key, level)
       }
     }
   }
   return {attrStr: attrStr, val: val};
 };
+
+function processTextOrObjNode (object, key, level) {
+  const result = this.j2x(object, level + 1);
+  if (object[this.options.textNodeName] !== undefined && Object.keys(object).length === 1) {
+    return this.buildTextNode(result.val, key, result.attrStr, level);
+  } else {
+    return this.buildObjNode(result.val, key, result.attrStr, level);
+  }
+}
 
 function replaceCDATAstr(str, cdata) {
   str = this.options.tagValueProcessor('' + str);
@@ -6138,7 +6150,7 @@ function replaceCDATAarr(str, cdata) {
 }
 
 function buildObjectNode(val, key, attrStr, level) {
-  if (attrStr && !val.includes('<')) {
+  if (attrStr && val.indexOf('<') === -1) {
     return (
       this.indentate(level) +
       '<' +
@@ -6279,7 +6291,7 @@ const _e = function(node, e_schema, options) {
         //attributes can't be repeated. hence check in children tags only
         str += chars.arrStart;
         const itemSchema = e_schema[0];
-        //var itemSchemaType = itemSchema;
+        //const itemSchemaType = itemSchema;
         const arr_len = node.length;
 
         if (typeof itemSchema === 'string') {
@@ -6365,7 +6377,7 @@ function hasData(jObj) {
 }
 
 const x2j = __nccwpck_require__(6712);
-const buildOptions = __nccwpck_require__(8280).buildOptions;
+const buildOptions = (__nccwpck_require__(8280).buildOptions);
 
 const convert2nimn = function(node, e_schema, options) {
   options = buildOptions(options, x2j.defaultOptions, x2j.props);
@@ -6389,7 +6401,7 @@ const convertToJson = function(node, options, parentTagName) {
   const jObj = {};
 
   // when no child node or attr is present
-  if ((!node.child || util.isEmptyObject(node.child)) && (!node.attrsMap || util.isEmptyObject(node.attrsMap))) {
+  if (!options.alwaysCreateTextNode && (!node.child || util.isEmptyObject(node.child)) && (!node.attrsMap || util.isEmptyObject(node.attrsMap))) {
     return util.isExist(node.val) ? node.val : '';
   }
 
@@ -6434,7 +6446,7 @@ exports.convertToJson = convertToJson;
 
 
 const util = __nccwpck_require__(8280);
-const buildOptions = __nccwpck_require__(8280).buildOptions;
+const buildOptions = (__nccwpck_require__(8280).buildOptions);
 const x2j = __nccwpck_require__(6712);
 
 //TODO: do it later
@@ -6452,10 +6464,10 @@ const _cToJsonStr = function(node, options, level) {
   const keys = Object.keys(node.child);
 
   for (let index = 0; index < keys.length; index++) {
-    var tagname = keys[index];
+    const tagname = keys[index];
     if (node.child[tagname] && node.child[tagname].length > 1) {
       jObj += '"' + tagname + '" : [ ';
-      for (var tag in node.child[tagname]) {
+      for (let tag in node.child[tagname]) {
         jObj += _cToJsonStr(node.child[tagname][tag], options) + ' , ';
       }
       jObj = jObj.substr(0, jObj.length - 1) + ' ] '; //remove extra comma in last
@@ -6507,7 +6519,7 @@ exports.convertToJsonString = convertToJsonString;
 const nodeToJson = __nccwpck_require__(8270);
 const xmlToNodeobj = __nccwpck_require__(6712);
 const x2xmlnode = __nccwpck_require__(6712);
-const buildOptions = __nccwpck_require__(8280).buildOptions;
+const buildOptions = (__nccwpck_require__(8280).buildOptions);
 const validator = __nccwpck_require__(1739);
 
 exports.parse = function(xmlData, givenOptions = {}, validationOption) {
@@ -6598,6 +6610,7 @@ const getAllMatches = function(string, regex) {
   let match = regex.exec(string);
   while (match) {
     const allmatches = [];
+    allmatches.startIndex = regex.lastIndex - match[0].length;
     const len = match.length;
     for (let index = 0; index < len; index++) {
       allmatches.push(match[index]);
@@ -6655,7 +6668,7 @@ exports.getValue = function(v) {
 // const fakeCallNoReturn = function() {};
 
 exports.buildOptions = function(options, defaultOptions, props) {
-  var newOptions = {};
+  let newOptions = {};
   if (!options) {
     return defaultOptions; //if there are not options
   }
@@ -6738,7 +6751,7 @@ exports.validate = function (xmlData, options) {
     }else if (xmlData[i] === '<') {
       //starting of tag
       //read until you reach to '>' avoiding any '>' in attribute value
-
+      let tagStartPos = i;
       i++;
       
       if (xmlData[i] === '!') {
@@ -6774,7 +6787,7 @@ exports.validate = function (xmlData, options) {
         if (!validateTagName(tagName)) {
           let msg;
           if (tagName.trim().length === 0) {
-            msg = "There is an unnecessary space between tag name and backward slash '</ ..'.";
+            msg = "Invalid space after '<'.";
           } else {
             msg = "Tag '"+tagName+"' is an invalid name.";
           }
@@ -6790,6 +6803,7 @@ exports.validate = function (xmlData, options) {
 
         if (attrStr[attrStr.length - 1] === '/') {
           //self closing tag
+          const attrStrStart = i - attrStr.length;
           attrStr = attrStr.substring(0, attrStr.length - 1);
           const isValid = validateAttributeString(attrStr, options);
           if (isValid === true) {
@@ -6799,17 +6813,20 @@ exports.validate = function (xmlData, options) {
             //the result from the nested function returns the position of the error within the attribute
             //in order to get the 'true' error line, we need to calculate the position where the attribute begins (i - attrStr.length) and then add the position within the attribute
             //this gives us the absolute index in the entire xml, which we can use to find the line at last
-            return getErrorObject(isValid.err.code, isValid.err.msg, getLineNumberForPosition(xmlData, i - attrStr.length + isValid.err.line));
+            return getErrorObject(isValid.err.code, isValid.err.msg, getLineNumberForPosition(xmlData, attrStrStart + isValid.err.line));
           }
         } else if (closingTag) {
           if (!result.tagClosed) {
             return getErrorObject('InvalidTag', "Closing tag '"+tagName+"' doesn't have proper closing.", getLineNumberForPosition(xmlData, i));
           } else if (attrStr.trim().length > 0) {
-            return getErrorObject('InvalidTag', "Closing tag '"+tagName+"' can't have attributes or invalid starting.", getLineNumberForPosition(xmlData, i));
+            return getErrorObject('InvalidTag', "Closing tag '"+tagName+"' can't have attributes or invalid starting.", getLineNumberForPosition(xmlData, tagStartPos));
           } else {
             const otg = tags.pop();
-            if (tagName !== otg) {
-              return getErrorObject('InvalidTag', "Closing tag '"+otg+"' is expected inplace of '"+tagName+"'.", getLineNumberForPosition(xmlData, i));
+            if (tagName !== otg.tagName) {
+              let openPos = getLineNumberForPosition(xmlData, otg.tagStartPos);
+              return getErrorObject('InvalidTag',
+                "Expected closing tag '"+otg.tagName+"' (opened in line "+openPos.line+", col "+openPos.col+") instead of closing tag '"+tagName+"'.",
+                getLineNumberForPosition(xmlData, tagStartPos));
             }
 
             //when there are no more tags, we reached the root level.
@@ -6830,7 +6847,7 @@ exports.validate = function (xmlData, options) {
           if (reachedRoot === true) {
             return getErrorObject('InvalidXml', 'Multiple possible root nodes found.', getLineNumberForPosition(xmlData, i));
           } else {
-            tags.push(tagName);
+            tags.push({tagName, tagStartPos});
           }
           tagFound = true;
         }
@@ -6871,8 +6888,12 @@ exports.validate = function (xmlData, options) {
 
   if (!tagFound) {
     return getErrorObject('InvalidXml', 'Start tag expected.', 1);
-  } else if (tags.length > 0) {
-    return getErrorObject('InvalidXml', "Invalid '"+JSON.stringify(tags, null, 4).replace(/\r?\n/g, '')+"' found.", 1);
+  }else if (tags.length == 1) {
+      return getErrorObject('InvalidTag', "Unclosed tag '"+tags[0].tagName+"'.", getLineNumberForPosition(xmlData, tags[0].tagStartPos));
+  }else if (tags.length > 0) {
+      return getErrorObject('InvalidXml', "Invalid '"+
+          JSON.stringify(tags.map(t => t.tagName), null, 4).replace(/\r?\n/g, '')+
+          "' found.", {line: 1, col: 1});
   }
 
   return true;
@@ -6884,11 +6905,11 @@ exports.validate = function (xmlData, options) {
  * @param {*} i
  */
 function readPI(xmlData, i) {
-  var start = i;
+  const start = i;
   for (; i < xmlData.length; i++) {
     if (xmlData[i] == '?' || xmlData[i] == ' ') {
       //tagname
-      var tagname = xmlData.substr(start, i - start);
+      const tagname = xmlData.substr(start, i - start);
       if (i > 5 && tagname === 'xml') {
         return getErrorObject('InvalidXml', 'XML declaration allowed only at the start of the document.', getLineNumberForPosition(xmlData, i));
       } else if (xmlData[i] == '?' && xmlData[i + 1] == '>') {
@@ -6954,8 +6975,8 @@ function readCommentAndCDATA(xmlData, i) {
   return i;
 }
 
-var doubleQuote = '"';
-var singleQuote = "'";
+const doubleQuote = '"';
+const singleQuote = "'";
 
 /**
  * Keep reading xmlData until '<' is found outside the attribute value.
@@ -6972,7 +6993,6 @@ function readAttributeStr(xmlData, i) {
         startChar = xmlData[i];
       } else if (startChar !== xmlData[i]) {
         //if vaue is enclosed with double quote then single quotes are allowed inside the value and vice versa
-        continue;
       } else {
         startChar = '';
       }
@@ -7013,23 +7033,23 @@ function validateAttributeString(attrStr, options) {
   for (let i = 0; i < matches.length; i++) {
     if (matches[i][1].length === 0) {
       //nospace before attribute name: a="sd"b="saf"
-      return getErrorObject('InvalidAttr', "Attribute '"+matches[i][2]+"' has no space in starting.", getPositionFromMatch(attrStr, matches[i][0]))
+      return getErrorObject('InvalidAttr', "Attribute '"+matches[i][2]+"' has no space in starting.", getPositionFromMatch(matches[i]))
     } else if (matches[i][3] === undefined && !options.allowBooleanAttributes) {
       //independent attribute: ab
-      return getErrorObject('InvalidAttr', "boolean attribute '"+matches[i][2]+"' is not allowed.", getPositionFromMatch(attrStr, matches[i][0]));
+      return getErrorObject('InvalidAttr', "boolean attribute '"+matches[i][2]+"' is not allowed.", getPositionFromMatch(matches[i]));
     }
     /* else if(matches[i][6] === undefined){//attribute without value: ab=
                     return { err: { code:"InvalidAttr",msg:"attribute " + matches[i][2] + " has no value assigned."}};
                 } */
     const attrName = matches[i][2];
     if (!validateAttrName(attrName)) {
-      return getErrorObject('InvalidAttr', "Attribute '"+attrName+"' is an invalid name.", getPositionFromMatch(attrStr, matches[i][0]));
+      return getErrorObject('InvalidAttr', "Attribute '"+attrName+"' is an invalid name.", getPositionFromMatch(matches[i]));
     }
     if (!attrNames.hasOwnProperty(attrName)) {
       //check for duplicate attribute.
       attrNames[attrName] = 1;
     } else {
-      return getErrorObject('InvalidAttr', "Attribute '"+attrName+"' is repeated.", getPositionFromMatch(attrStr, matches[i][0]));
+      return getErrorObject('InvalidAttr', "Attribute '"+attrName+"' is repeated.", getPositionFromMatch(matches[i]));
     }
   }
 
@@ -7076,7 +7096,8 @@ function getErrorObject(code, message, lineNumber) {
     err: {
       code: code,
       msg: message,
-      line: lineNumber,
+      line: lineNumber.line || lineNumber,
+      col: lineNumber.col,
     },
   };
 }
@@ -7093,13 +7114,18 @@ function validateTagName(tagname) {
 
 //this function returns the line number for the character at the given index
 function getLineNumberForPosition(xmlData, index) {
-  var lines = xmlData.substring(0, index).split(/\r?\n/);
-  return lines.length;
+  const lines = xmlData.substring(0, index).split(/\r?\n/);
+  return {
+    line: lines.length,
+
+    // column number is last line's length + 1, because column numbering starts at 1:
+    col: lines[lines.length - 1].length + 1
+  };
 }
 
-//this function returns the position of the last character of match within attrStr
-function getPositionFromMatch(attrStr, match) {
-  return attrStr.indexOf(match) + match.length;
+//this function returns the position of the first character of match within attrStr
+function getPositionFromMatch(match) {
+  return match.startIndex + match[1].length;
 }
 
 
@@ -7137,7 +7163,7 @@ module.exports = function(tagname, parent, val) {
 
 
 const util = __nccwpck_require__(8280);
-const buildOptions = __nccwpck_require__(8280).buildOptions;
+const buildOptions = (__nccwpck_require__(8280).buildOptions);
 const xmlNode = __nccwpck_require__(9539);
 const toNumber = __nccwpck_require__(4526);
 
@@ -7180,7 +7206,8 @@ const defaultOptions = {
   attrValueProcessor: function(a, attrName) {
     return a;
   },
-  stopNodes: []
+  stopNodes: [],
+  alwaysCreateTextNode: false
   //decodeStrict: false,
 };
 
@@ -7203,7 +7230,8 @@ const props = [
   'attrValueProcessor',
   'parseTrueNumberOnly',
   'numParseOptions',
-  'stopNodes'
+  'stopNodes',
+  'alwaysCreateTextNode'
 ];
 exports.props = props;
 
@@ -7529,7 +7557,7 @@ minimatch.Minimatch = Minimatch
 
 var path = { sep: '/' }
 try {
-  path = __nccwpck_require__(5622)
+  path = __nccwpck_require__(1017)
 } catch (er) {}
 
 var GLOBSTAR = minimatch.GLOBSTAR = Minimatch.GLOBSTAR = {}
@@ -8461,11 +8489,11 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var Stream = _interopDefault(__nccwpck_require__(2413));
-var http = _interopDefault(__nccwpck_require__(8605));
-var Url = _interopDefault(__nccwpck_require__(8835));
-var https = _interopDefault(__nccwpck_require__(7211));
-var zlib = _interopDefault(__nccwpck_require__(8761));
+var Stream = _interopDefault(__nccwpck_require__(2781));
+var http = _interopDefault(__nccwpck_require__(3685));
+var Url = _interopDefault(__nccwpck_require__(7310));
+var https = _interopDefault(__nccwpck_require__(5687));
+var zlib = _interopDefault(__nccwpck_require__(9796));
 
 // Based on https://github.com/tmpvar/jsdom/blob/aa85b2abf07766ff7bf5c1f6daafb3726f2f2db5/lib/jsdom/living/blob.js
 
@@ -8616,7 +8644,7 @@ FetchError.prototype.name = 'FetchError';
 
 let convert;
 try {
-	convert = __nccwpck_require__(2877).convert;
+	convert = (__nccwpck_require__(2877).convert);
 } catch (e) {}
 
 const INTERNALS = Symbol('Body internals');
@@ -10099,7 +10127,7 @@ fetch.Promise = global.Promise;
 
 module.exports = exports = fetch;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.default = exports;
+exports["default"] = exports;
 exports.Headers = Headers;
 exports.Request = Request;
 exports.Response = Response;
@@ -10228,13 +10256,13 @@ module.exports = __nccwpck_require__(4219);
 "use strict";
 
 
-var net = __nccwpck_require__(1631);
-var tls = __nccwpck_require__(4016);
-var http = __nccwpck_require__(8605);
-var https = __nccwpck_require__(7211);
-var events = __nccwpck_require__(8614);
-var assert = __nccwpck_require__(2357);
-var util = __nccwpck_require__(1669);
+var net = __nccwpck_require__(1808);
+var tls = __nccwpck_require__(4404);
+var http = __nccwpck_require__(3685);
+var https = __nccwpck_require__(5687);
+var events = __nccwpck_require__(2361);
+var assert = __nccwpck_require__(9491);
+var util = __nccwpck_require__(3837);
 
 
 exports.httpOverHttp = httpOverHttp;
@@ -10568,7 +10596,7 @@ module.exports = eval("require")("encoding");
 
 /***/ }),
 
-/***/ 2357:
+/***/ 9491:
 /***/ ((module) => {
 
 "use strict";
@@ -10576,7 +10604,7 @@ module.exports = require("assert");
 
 /***/ }),
 
-/***/ 6417:
+/***/ 6113:
 /***/ ((module) => {
 
 "use strict";
@@ -10584,7 +10612,7 @@ module.exports = require("crypto");
 
 /***/ }),
 
-/***/ 8614:
+/***/ 2361:
 /***/ ((module) => {
 
 "use strict";
@@ -10592,7 +10620,7 @@ module.exports = require("events");
 
 /***/ }),
 
-/***/ 5747:
+/***/ 7147:
 /***/ ((module) => {
 
 "use strict";
@@ -10600,7 +10628,7 @@ module.exports = require("fs");
 
 /***/ }),
 
-/***/ 8605:
+/***/ 3685:
 /***/ ((module) => {
 
 "use strict";
@@ -10608,7 +10636,7 @@ module.exports = require("http");
 
 /***/ }),
 
-/***/ 7211:
+/***/ 5687:
 /***/ ((module) => {
 
 "use strict";
@@ -10616,7 +10644,7 @@ module.exports = require("https");
 
 /***/ }),
 
-/***/ 1631:
+/***/ 1808:
 /***/ ((module) => {
 
 "use strict";
@@ -10624,7 +10652,7 @@ module.exports = require("net");
 
 /***/ }),
 
-/***/ 2087:
+/***/ 2037:
 /***/ ((module) => {
 
 "use strict";
@@ -10632,7 +10660,7 @@ module.exports = require("os");
 
 /***/ }),
 
-/***/ 5622:
+/***/ 1017:
 /***/ ((module) => {
 
 "use strict";
@@ -10640,7 +10668,7 @@ module.exports = require("path");
 
 /***/ }),
 
-/***/ 2413:
+/***/ 2781:
 /***/ ((module) => {
 
 "use strict";
@@ -10648,7 +10676,7 @@ module.exports = require("stream");
 
 /***/ }),
 
-/***/ 4016:
+/***/ 4404:
 /***/ ((module) => {
 
 "use strict";
@@ -10656,7 +10684,7 @@ module.exports = require("tls");
 
 /***/ }),
 
-/***/ 8835:
+/***/ 7310:
 /***/ ((module) => {
 
 "use strict";
@@ -10664,7 +10692,7 @@ module.exports = require("url");
 
 /***/ }),
 
-/***/ 1669:
+/***/ 3837:
 /***/ ((module) => {
 
 "use strict";
@@ -10672,7 +10700,7 @@ module.exports = require("util");
 
 /***/ }),
 
-/***/ 8761:
+/***/ 9796:
 /***/ ((module) => {
 
 "use strict";
