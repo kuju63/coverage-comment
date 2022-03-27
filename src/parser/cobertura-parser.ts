@@ -23,15 +23,15 @@ export class CoberturaParser implements IParser {
     if (!fs.existsSync(path)) {
       return
     }
-    const coverageXml = parser.parse(fs.readFileSync(path).toString('utf-8'), {
+    const xmlParser = new parser.XMLParser({
       attributeNamePrefix: '@_',
-      attrNodeName: 'attr',
+      attributesGroupName: 'attr',
       textNodeName: '#text',
       ignoreAttributes: false,
-      parseNodeValue: true,
       parseAttributeValue: true,
       trimValues: true
     })
+    const coverageXml = xmlParser.parse(fs.readFileSync(path))
     coverageXml.coverage.packages
     const packages = this.parsePackage(coverageXml.coverage.packages.package)
     return {
