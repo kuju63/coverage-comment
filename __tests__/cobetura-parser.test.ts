@@ -1,14 +1,16 @@
-import {mocked} from 'ts-jest/utils'
 import {CoberturaParser} from '../src/parser/cobertura-parser'
-import fs from 'fs'
+import fs, {PathOrFileDescriptor, readSync} from 'fs'
 import * as core from '@actions/core'
+import {jest} from '@jest/globals'
 
 jest.mock('fs')
 jest.mock('@actions/core')
 
-const fsExists = mocked(fs.existsSync)
-const fsReadSync = mocked(fs.readFileSync)
-const coreDebug = mocked(core.debug)
+
+const fsExists = jest.spyOn(fs, 'existsSync')
+// const fsExists = jest.mocked(fs.existsSync)
+const fsReadSync = jest.spyOn(fs, 'readFileSync')
+const coreDebug = jest.mocked(core.debug)
 afterEach(() => {
   fsExists.mockClear()
   fsReadSync.mockClear()
@@ -25,7 +27,8 @@ describe('Test CobeturaParser', () => {
 
   it('Multiple packages and many classes, methods', () => {
     fsExists.mockImplementation(_ => true)
-    fsReadSync.mockImplementation(_path => {
+    /** eslint no-explicit-any: 0 */
+    fsReadSync.mockImplementation((_path: any, _options: any):Buffer => {
       return Buffer.from(`<?xml version="1.0" encoding="utf-8"?>
       <coverage line-rate="0.8181" branch-rate="0.75" version="1.9" timestamp="1622395212" lines-covered="9" lines-valid="11" branches-covered="3" branches-valid="4">
         <sources>
