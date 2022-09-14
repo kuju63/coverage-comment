@@ -4,7 +4,6 @@ import {jest} from '@jest/globals'
 
 jest.mock('fs')
 
-
 const fsExists = jest.spyOn(fs, 'existsSync')
 const fsReadSync = jest.spyOn(fs, 'readFileSync')
 afterEach(() => {
@@ -23,7 +22,7 @@ describe('Test CobeturaParser', () => {
   it('Multiple packages and many classes, methods', () => {
     fsExists.mockImplementation(_ => true)
     /** eslint no-explicit-any: 0 */
-    fsReadSync.mockImplementation((_path: any, _options: any):Buffer => {
+    fsReadSync.mockImplementation((_path: any, _options: any): Buffer => {
       return Buffer.from(`<?xml version="1.0" encoding="utf-8"?>
       <coverage line-rate="0.8181" branch-rate="0.75" version="1.9" timestamp="1622395212" lines-covered="9" lines-valid="11" branches-covered="3" branches-valid="4">
         <sources>
