@@ -1,4 +1,3 @@
-import * as core from '@actions/core'
 import {
   CoverageEntity,
   IParser,
@@ -48,7 +47,6 @@ export class CoberturaParser implements IParser {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private parsePackage(coverage: any): ObjectEntity[] | undefined {
     if (coverage instanceof Array) {
-      core.debug('Array')
       return coverage.map(v => {
         let classCoverage: ObjectEntity[] | undefined = undefined
         if (v.classes) {
@@ -63,7 +61,6 @@ export class CoberturaParser implements IParser {
         }
       })
     } else {
-      core.debug('Object')
       return [
         {
           name: coverage.attr[nameAttr],

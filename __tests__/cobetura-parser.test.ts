@@ -1,20 +1,15 @@
 import {CoberturaParser} from '../src/parser/cobertura-parser'
-import fs, {PathOrFileDescriptor, readSync} from 'fs'
-import * as core from '@actions/core'
+import fs from 'fs'
 import {jest} from '@jest/globals'
 
 jest.mock('fs')
-jest.mock('@actions/core')
 
 
 const fsExists = jest.spyOn(fs, 'existsSync')
-// const fsExists = jest.mocked(fs.existsSync)
 const fsReadSync = jest.spyOn(fs, 'readFileSync')
-const coreDebug = jest.mocked(core.debug)
 afterEach(() => {
   fsExists.mockClear()
   fsReadSync.mockClear()
-  coreDebug.mockClear()
 })
 
 describe('Test CobeturaParser', () => {
@@ -84,7 +79,6 @@ describe('Test CobeturaParser', () => {
     })
     const target = new CoberturaParser()
     const actual = target.parse('sample.xml')
-    expect(coreDebug.mock.calls[0]).toEqual(['Array'])
     expect(actual).toStrictEqual({
       lineRate: 0.8181,
       branchRate: 0.75,
@@ -147,7 +141,6 @@ describe('Test CobeturaParser', () => {
         }
       ]
     })
-    console.log(coreDebug.mock.calls[1])
   })
   it('Single package and single class, method', () => {
     fsExists.mockImplementation(_ => true)
@@ -181,7 +174,6 @@ describe('Test CobeturaParser', () => {
     })
     const target = new CoberturaParser()
     const actual = target.parse('sample.xml')
-    expect(coreDebug.mock.calls[0]).toEqual(['Object'])
     expect(actual).toStrictEqual({
       lineRate: 0.8181,
       branchRate: 0.75,
@@ -215,6 +207,5 @@ describe('Test CobeturaParser', () => {
         }
       ]
     })
-    console.log(coreDebug.mock.calls[1])
   })
 })
