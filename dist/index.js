@@ -53,7 +53,7 @@ const cobertura_parser_1 = __nccwpck_require__(9827);
 const message_builder_1 = __nccwpck_require__(4012);
 const types = ['cobertura'];
 function run() {
-    var e_1, _a;
+    var _a, e_1, _b, _c;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const debug = core.getInput('debug') === '1';
@@ -69,27 +69,34 @@ function run() {
             let totalLineRate = 0.0;
             let totalBranchRate = 0.0;
             try {
-                for (var _b = __asyncValues(globber.globGenerator()), _c; _c = yield _b.next(), !_c.done;) {
-                    const file = _c.value;
-                    core.info(`load coverage file ${file}`);
-                    const coverage = parser.parse(file);
-                    if (coverage) {
-                        if (coverage.objectCoverages) {
-                            for (const obj of coverage.objectCoverages) {
-                                builder.appendCoverage(obj.name, '', '', obj.lineRate * 100, obj.branchRate * 100);
-                                appendClassCoverage(builder, obj.name, '', obj.objectCoverages, obj.methodCoverages);
+                for (var _d = true, _e = __asyncValues(globber.globGenerator()), _f; _f = yield _e.next(), _a = _f.done, !_a;) {
+                    _c = _f.value;
+                    _d = false;
+                    try {
+                        const file = _c;
+                        core.info(`load coverage file ${file}`);
+                        const coverage = parser.parse(file);
+                        if (coverage) {
+                            if (coverage.objectCoverages) {
+                                for (const obj of coverage.objectCoverages) {
+                                    builder.appendCoverage(obj.name, '', '', obj.lineRate * 100, obj.branchRate * 100);
+                                    appendClassCoverage(builder, obj.name, '', obj.objectCoverages, obj.methodCoverages);
+                                }
                             }
+                            totalLineRate += coverage.lineRate;
+                            totalBranchRate += coverage.branchRate;
                         }
-                        totalLineRate += coverage.lineRate;
-                        totalBranchRate += coverage.branchRate;
+                        totalModuleCount++;
                     }
-                    totalModuleCount++;
+                    finally {
+                        _d = true;
+                    }
                 }
             }
             catch (e_1_1) { e_1 = { error: e_1_1 }; }
             finally {
                 try {
-                    if (_c && !_c.done && (_a = _b.return)) yield _a.call(_b);
+                    if (!_d && !_a && (_b = _e.return)) yield _b.call(_e);
                 }
                 finally { if (e_1) throw e_1.error; }
             }
@@ -515,13 +522,9 @@ function exportVariable(name, val) {
     process.env[name] = convertedVal;
     const filePath = process.env['GITHUB_ENV'] || '';
     if (filePath) {
-        const delimiter = '_GitHubActionsFileCommandDelimeter_';
-        const commandValue = `${name}<<${delimiter}${os.EOL}${convertedVal}${os.EOL}${delimiter}`;
-        file_command_1.issueCommand('ENV', commandValue);
+        return file_command_1.issueFileCommand('ENV', file_command_1.prepareKeyValueMessage(name, val));
     }
-    else {
-        command_1.issueCommand('set-env', { name }, convertedVal);
-    }
+    command_1.issueCommand('set-env', { name }, convertedVal);
 }
 exports.exportVariable = exportVariable;
 /**
@@ -539,7 +542,7 @@ exports.setSecret = setSecret;
 function addPath(inputPath) {
     const filePath = process.env['GITHUB_PATH'] || '';
     if (filePath) {
-        file_command_1.issueCommand('PATH', inputPath);
+        file_command_1.issueFileCommand('PATH', inputPath);
     }
     else {
         command_1.issueCommand('add-path', {}, inputPath);
@@ -579,7 +582,10 @@ function getMultilineInput(name, options) {
     const inputs = getInput(name, options)
         .split('\n')
         .filter(x => x !== '');
-    return inputs;
+    if (options && options.trimWhitespace === false) {
+        return inputs;
+    }
+    return inputs.map(input => input.trim());
 }
 exports.getMultilineInput = getMultilineInput;
 /**
@@ -612,8 +618,12 @@ exports.getBooleanInput = getBooleanInput;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function setOutput(name, value) {
+    const filePath = process.env['GITHUB_OUTPUT'] || '';
+    if (filePath) {
+        return file_command_1.issueFileCommand('OUTPUT', file_command_1.prepareKeyValueMessage(name, value));
+    }
     process.stdout.write(os.EOL);
-    command_1.issueCommand('set-output', { name }, value);
+    command_1.issueCommand('set-output', { name }, utils_1.toCommandValue(value));
 }
 exports.setOutput = setOutput;
 /**
@@ -742,7 +752,11 @@ exports.group = group;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function saveState(name, value) {
-    command_1.issueCommand('save-state', { name }, value);
+    const filePath = process.env['GITHUB_STATE'] || '';
+    if (filePath) {
+        return file_command_1.issueFileCommand('STATE', file_command_1.prepareKeyValueMessage(name, value));
+    }
+    command_1.issueCommand('save-state', { name }, utils_1.toCommandValue(value));
 }
 exports.saveState = saveState;
 /**
@@ -771,6 +785,13 @@ Object.defineProperty(exports, "summary", ({ enumerable: true, get: function () 
  */
 var summary_2 = __nccwpck_require__(1327);
 Object.defineProperty(exports, "markdownSummary", ({ enumerable: true, get: function () { return summary_2.markdownSummary; } }));
+/**
+ * Path exports
+ */
+var path_utils_1 = __nccwpck_require__(2981);
+Object.defineProperty(exports, "toPosixPath", ({ enumerable: true, get: function () { return path_utils_1.toPosixPath; } }));
+Object.defineProperty(exports, "toWin32Path", ({ enumerable: true, get: function () { return path_utils_1.toWin32Path; } }));
+Object.defineProperty(exports, "toPlatformPath", ({ enumerable: true, get: function () { return path_utils_1.toPlatformPath; } }));
 //# sourceMappingURL=core.js.map
 
 /***/ }),
@@ -801,13 +822,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.issueCommand = void 0;
+exports.prepareKeyValueMessage = exports.issueFileCommand = void 0;
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const fs = __importStar(__nccwpck_require__(7147));
 const os = __importStar(__nccwpck_require__(2037));
+const uuid_1 = __nccwpck_require__(5840);
 const utils_1 = __nccwpck_require__(5278);
-function issueCommand(command, message) {
+function issueFileCommand(command, message) {
     const filePath = process.env[`GITHUB_${command}`];
     if (!filePath) {
         throw new Error(`Unable to find environment variable for file command ${command}`);
@@ -819,7 +841,22 @@ function issueCommand(command, message) {
         encoding: 'utf8'
     });
 }
-exports.issueCommand = issueCommand;
+exports.issueFileCommand = issueFileCommand;
+function prepareKeyValueMessage(key, value) {
+    const delimiter = `ghadelimiter_${uuid_1.v4()}`;
+    const convertedValue = utils_1.toCommandValue(value);
+    // These should realistically never happen, but just in case someone finds a
+    // way to exploit uuid generation let's not allow keys or values that contain
+    // the delimiter.
+    if (key.includes(delimiter)) {
+        throw new Error(`Unexpected input: name should not contain the delimiter "${delimiter}"`);
+    }
+    if (convertedValue.includes(delimiter)) {
+        throw new Error(`Unexpected input: value should not contain the delimiter "${delimiter}"`);
+    }
+    return `${key}<<${delimiter}${os.EOL}${convertedValue}${os.EOL}${delimiter}`;
+}
+exports.prepareKeyValueMessage = prepareKeyValueMessage;
 //# sourceMappingURL=file-command.js.map
 
 /***/ }),
@@ -905,6 +942,71 @@ class OidcClient {
 }
 exports.OidcClient = OidcClient;
 //# sourceMappingURL=oidc-utils.js.map
+
+/***/ }),
+
+/***/ 2981:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.toPlatformPath = exports.toWin32Path = exports.toPosixPath = void 0;
+const path = __importStar(__nccwpck_require__(1017));
+/**
+ * toPosixPath converts the given path to the posix form. On Windows, \\ will be
+ * replaced with /.
+ *
+ * @param pth. Path to transform.
+ * @return string Posix path.
+ */
+function toPosixPath(pth) {
+    return pth.replace(/[\\]/g, '/');
+}
+exports.toPosixPath = toPosixPath;
+/**
+ * toWin32Path converts the given path to the win32 form. On Linux, / will be
+ * replaced with \\.
+ *
+ * @param pth. Path to transform.
+ * @return string Win32 path.
+ */
+function toWin32Path(pth) {
+    return pth.replace(/[/]/g, '\\');
+}
+exports.toWin32Path = toWin32Path;
+/**
+ * toPlatformPath converts the given path to a platform-specific path. It does
+ * this by replacing instances of / and \ with the platform-specific path
+ * separator.
+ *
+ * @param pth The path to platformize.
+ * @return string The platform-specific path.
+ */
+function toPlatformPath(pth) {
+    return pth.replace(/[/\\]/g, path.sep);
+}
+exports.toPlatformPath = toPlatformPath;
+//# sourceMappingURL=path-utils.js.map
 
 /***/ }),
 
@@ -1341,8 +1443,9 @@ exports.context = new Context.Context();
  * @param     token    the repo PAT or GITHUB_TOKEN
  * @param     options  other options to set
  */
-function getOctokit(token, options) {
-    return new utils_1.GitHub(utils_1.getOctokitOptions(token, options));
+function getOctokit(token, options, ...additionalPlugins) {
+    const GitHubWithPlugins = utils_1.GitHub.plugin(...additionalPlugins);
+    return new GitHubWithPlugins(utils_1.getOctokitOptions(token, options));
 }
 exports.getOctokit = getOctokit;
 //# sourceMappingURL=github.js.map
@@ -1424,7 +1527,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getOctokitOptions = exports.GitHub = exports.context = void 0;
+exports.getOctokitOptions = exports.GitHub = exports.defaults = exports.context = void 0;
 const Context = __importStar(__nccwpck_require__(4087));
 const Utils = __importStar(__nccwpck_require__(7914));
 // octokit + plugins
@@ -1433,13 +1536,13 @@ const plugin_rest_endpoint_methods_1 = __nccwpck_require__(3044);
 const plugin_paginate_rest_1 = __nccwpck_require__(4193);
 exports.context = new Context.Context();
 const baseUrl = Utils.getApiBaseUrl();
-const defaults = {
+exports.defaults = {
     baseUrl,
     request: {
         agent: Utils.getProxyAgent(baseUrl)
     }
 };
-exports.GitHub = core_1.Octokit.plugin(plugin_rest_endpoint_methods_1.restEndpointMethods, plugin_paginate_rest_1.paginateRest).defaults(defaults);
+exports.GitHub = core_1.Octokit.plugin(plugin_rest_endpoint_methods_1.restEndpointMethods, plugin_paginate_rest_1.paginateRest).defaults(exports.defaults);
 /**
  * Convience function to correctly format Octokit Options to pass into the constructor.
  *
@@ -6777,7 +6880,9 @@ const defaultOptions = {
     { regex: new RegExp("\"", "g"), val: "&quot;" }
   ],
   processEntities: true,
-  stopNodes: []
+  stopNodes: [],
+  // transformTagName: false,
+  // transformAttributeName: false,
 };
 
 function Builder(options) {
@@ -6804,20 +6909,6 @@ function Builder(options) {
     this.tagEndChar = '>';
     this.newLine = '';
   }
-
-  if (this.options.suppressEmptyNode) {
-    this.buildTextNode = buildEmptyTextNode;
-    this.buildObjNode = buildEmptyObjNode;
-  } else {
-    this.buildTextNode = buildTextValNode;
-    this.buildObjNode = buildObjectNode;
-  }
-
-  this.buildTextValNode = buildTextValNode;
-  this.buildObjectNode = buildObjectNode;
-
-  this.replaceEntitiesValue = replaceEntitiesValue;
-  this.buildAttrPairStr = buildAttrPairStr;
 }
 
 Builder.prototype.build = function(jObj) {
@@ -6844,7 +6935,7 @@ Builder.prototype.j2x = function(jObj, level) {
       else val += this.indentate(level) + '<' + key + '/' + this.tagEndChar;
       // val += this.indentate(level) + '<' + key + '/' + this.tagEndChar;
     } else if (jObj[key] instanceof Date) {
-      val += this.buildTextNode(jObj[key], key, '', level);
+      val += this.buildTextValNode(jObj[key], key, '', level);
     } else if (typeof jObj[key] !== 'object') {
       //premitive type
       const attr = this.isAttribute(key);
@@ -6856,7 +6947,7 @@ Builder.prototype.j2x = function(jObj, level) {
           let newval = this.options.tagValueProcessor(key, '' + jObj[key]);
           val += this.replaceEntitiesValue(newval);
         } else {
-          val += this.buildTextNode(jObj[key], key, '', level);
+          val += this.buildTextValNode(jObj[key], key, '', level);
         }
       }
     } else if (Array.isArray(jObj[key])) {
@@ -6873,7 +6964,7 @@ Builder.prototype.j2x = function(jObj, level) {
         } else if (typeof item === 'object') {
           val += this.processTextOrObjNode(item, key, level)
         } else {
-          val += this.buildTextNode(item, key, '', level);
+          val += this.buildTextValNode(item, key, '', level);
         }
       }
     } else {
@@ -6892,7 +6983,7 @@ Builder.prototype.j2x = function(jObj, level) {
   return {attrStr: attrStr, val: val};
 };
 
-function buildAttrPairStr(attrName, val){
+Builder.prototype.buildAttrPairStr = function(attrName, val){
   val = this.options.attributeValueProcessor(attrName, '' + val);
   val = this.replaceEntitiesValue(val);
   if (this.options.suppressBooleanAttributes && val === "true") {
@@ -6903,31 +6994,51 @@ function buildAttrPairStr(attrName, val){
 function processTextOrObjNode (object, key, level) {
   const result = this.j2x(object, level + 1);
   if (object[this.options.textNodeName] !== undefined && Object.keys(object).length === 1) {
-    return this.buildTextNode(object[this.options.textNodeName], key, result.attrStr, level);
+    return this.buildTextValNode(object[this.options.textNodeName], key, result.attrStr, level);
   } else {
-    return this.buildObjNode(result.val, key, result.attrStr, level);
+    return this.buildObjectNode(result.val, key, result.attrStr, level);
   }
 }
 
-function buildObjectNode(val, key, attrStr, level) {
-  let tagEndExp = '</' + key + this.tagEndChar;
-  let piClosingChar = "";
-  
-  if(key[0] === "?") {
-    piClosingChar = "?";
-    tagEndExp = "";
-  }
+Builder.prototype.buildObjectNode = function(val, key, attrStr, level) {
+  if(val === ""){
+    if(key[0] === "?") return  this.indentate(level) + '<' + key + attrStr+ '?' + this.tagEndChar;
+    else {
+      return this.indentate(level) + '<' + key + attrStr + this.closeTag(key) + this.tagEndChar;
+    }
+  }else{
 
-  if (attrStr && val.indexOf('<') === -1) {
-    return ( this.indentate(level) + '<' +  key + attrStr + piClosingChar + '>' + val + tagEndExp );
-  } else if (this.options.commentPropName !== false && key === this.options.commentPropName && piClosingChar.length === 0) {
-    return this.indentate(level) + `<!--${val}-->` + this.newLine;
-  }else {
-    return (
-      this.indentate(level) + '<' + key + attrStr + piClosingChar + this.tagEndChar +
-      val +
-      this.indentate(level) + tagEndExp    );
+    let tagEndExp = '</' + key + this.tagEndChar;
+    let piClosingChar = "";
+    
+    if(key[0] === "?") {
+      piClosingChar = "?";
+      tagEndExp = "";
+    }
+  
+    if (attrStr && val.indexOf('<') === -1) {
+      return ( this.indentate(level) + '<' +  key + attrStr + piClosingChar + '>' + val + tagEndExp );
+    } else if (this.options.commentPropName !== false && key === this.options.commentPropName && piClosingChar.length === 0) {
+      return this.indentate(level) + `<!--${val}-->` + this.newLine;
+    }else {
+      return (
+        this.indentate(level) + '<' + key + attrStr + piClosingChar + this.tagEndChar +
+        val +
+        this.indentate(level) + tagEndExp    );
+    }
   }
+}
+
+Builder.prototype.closeTag = function(key){
+  let closeTag = "";
+  if(this.options.unpairedTags.indexOf(key) !== -1){ //unpaired
+    if(!this.options.suppressUnpairedNode) closeTag = "/"
+  }else if(this.options.suppressEmptyNode){ //empty
+    closeTag = "/";
+  }else{
+    closeTag = `></${key}`
+  }
+  return closeTag;
 }
 
 function buildEmptyObjNode(val, key, attrStr, level) {
@@ -6935,36 +7046,35 @@ function buildEmptyObjNode(val, key, attrStr, level) {
     return this.buildObjectNode(val, key, attrStr, level);
   } else {
     if(key[0] === "?") return  this.indentate(level) + '<' + key + attrStr+ '?' + this.tagEndChar;
-    else return  this.indentate(level) + '<' + key + attrStr + '/' + this.tagEndChar;
+    else {
+      return  this.indentate(level) + '<' + key + attrStr + '/' + this.tagEndChar;
+      // return this.buildTagStr(level,key, attrStr);
+    }
   }
 }
 
-function buildTextValNode(val, key, attrStr, level) {
+Builder.prototype.buildTextValNode = function(val, key, attrStr, level) {
   if (this.options.cdataPropName !== false && key === this.options.cdataPropName) {
     return this.indentate(level) + `<![CDATA[${val}]]>` +  this.newLine;
   }else if (this.options.commentPropName !== false && key === this.options.commentPropName) {
     return this.indentate(level) + `<!--${val}-->` +  this.newLine;
+  }else if(key[0] === "?") {//PI tag
+    return  this.indentate(level) + '<' + key + attrStr+ '?' + this.tagEndChar; 
   }else{
     let textValue = this.options.tagValueProcessor(key, val);
     textValue = this.replaceEntitiesValue(textValue);
   
-    if( textValue === '' && this.options.unpairedTags.indexOf(key) !== -1){ //unpaired
-      if(this.options.suppressUnpairedNode){
-        return this.indentate(level) + '<' + key + this.tagEndChar;
-      }else{
-        return this.indentate(level) + '<' + key + "/" + this.tagEndChar;
-      }
-    } else{
-      return (
-        this.indentate(level) + '<' + key + attrStr + '>' +
+    if( textValue === ''){
+      return this.indentate(level) + '<' + key + attrStr + this.closeTag(key) + this.tagEndChar;
+    }else{
+      return this.indentate(level) + '<' + key + attrStr + '>' +
          textValue +
-        '</' + key + this.tagEndChar  );
+        '</' + key + this.tagEndChar;
     }
-
   }
 }
 
-function replaceEntitiesValue(textValue){
+Builder.prototype.replaceEntitiesValue = function(textValue){
   if(textValue && textValue.length > 0 && this.options.processEntities){
     for (let i=0; i<this.options.entities.length; i++) {
       const entity = this.options.entities[i];
@@ -6972,21 +7082,6 @@ function replaceEntitiesValue(textValue){
     }
   }
   return textValue;
-}
-
-function buildEmptyTextNode(val, key, attrStr, level) {
-  if( val === '' && this.options.unpairedTags.indexOf(key) !== -1){ //unpaired
-    if(this.options.suppressUnpairedNode){
-      return this.indentate(level) + '<' + key + this.tagEndChar;
-    }else{
-      return this.indentate(level) + '<' + key + "/" + this.tagEndChar;
-    }
-  }else if (val !== '') { //empty
-    return this.buildTextValNode(val, key, attrStr, level);
-  } else {
-    if(key[0] === "?") return  this.indentate(level) + '<' + key + attrStr+ '?' + this.tagEndChar; //PI tag
-    else return  this.indentate(level) + '<' + key + attrStr + '/' + this.tagEndChar; //normal
-  }
 }
 
 function indentate(level) {
@@ -7017,107 +7112,130 @@ const EOL = "\n";
  * @param {any} options 
  * @returns 
  */
-function toXml(jArray, options){
-    return arrToStr( jArray, options, "", 0);
+function toXml(jArray, options) {
+    let indentation = "";
+    if (options.format && options.indentBy.length > 0) {
+        indentation = EOL;
+    }
+    return arrToStr(jArray, options, "", indentation);
 }
 
-function arrToStr(arr, options, jPath, level){
+function arrToStr(arr, options, jPath, indentation) {
     let xmlStr = "";
-
-    let indentation = "";
-    if(options.format && options.indentBy.length > 0){//TODO: this logic can be avoided for each call
-        indentation = EOL + "" + options.indentBy.repeat(level);
-    }
+    let isPreviousElementTag = false;
 
     for (let i = 0; i < arr.length; i++) {
         const tagObj = arr[i];
         const tagName = propName(tagObj);
         let newJPath = "";
-        if(jPath.length === 0) newJPath = tagName
+        if (jPath.length === 0) newJPath = tagName
         else newJPath = `${jPath}.${tagName}`;
 
-        if(tagName === options.textNodeName){
+        if (tagName === options.textNodeName) {
             let tagText = tagObj[tagName];
-            if(!isStopNode(newJPath, options)){
-                tagText = options.tagValueProcessor( tagName, tagText);
+            if (!isStopNode(newJPath, options)) {
+                tagText = options.tagValueProcessor(tagName, tagText);
                 tagText = replaceEntitiesValue(tagText, options);
             }
-            xmlStr += indentation + tagText;
+            if (isPreviousElementTag) {
+                xmlStr += indentation;
+            }
+            xmlStr += tagText;
+            isPreviousElementTag = false;
             continue;
-        }else if( tagName === options.cdataPropName){
-            xmlStr += indentation + `<![CDATA[${tagObj[tagName][0][options.textNodeName]}]]>`;
+        } else if (tagName === options.cdataPropName) {
+            if (isPreviousElementTag) {
+                xmlStr += indentation;
+            }
+            xmlStr += `<![CDATA[${tagObj[tagName][0][options.textNodeName]}]]>`;
+            isPreviousElementTag = false;
             continue;
-        }else if( tagName === options.commentPropName){
+        } else if (tagName === options.commentPropName) {
             xmlStr += indentation + `<!--${tagObj[tagName][0][options.textNodeName]}-->`;
+            isPreviousElementTag = true;
             continue;
-        }else if( tagName[0] === "?"){
+        } else if (tagName[0] === "?") {
             const attStr = attr_to_str(tagObj[":@"], options);
             const tempInd = tagName === "?xml" ? "" : indentation;
             let piTextNodeName = tagObj[tagName][0][options.textNodeName];
             piTextNodeName = piTextNodeName.length !== 0 ? " " + piTextNodeName : ""; //remove extra spacing
             xmlStr += tempInd + `<${tagName}${piTextNodeName}${attStr}?>`;
+            isPreviousElementTag = true;
             continue;
         }
-        const attStr = attr_to_str(tagObj[":@"], options);
-        let tagStart =  indentation + `<${tagName}${attStr}`;
-        let tagValue = arrToStr(tagObj[tagName], options, newJPath, level + 1);
-        if(options.unpairedTags.indexOf(tagName) !== -1){
-            if(options.suppressUnpairedNode)  xmlStr += tagStart + ">"; 
-            else xmlStr += tagStart + "/>"; 
-        }else if( (!tagValue || tagValue.length === 0) && options.suppressEmptyNode){ 
-            xmlStr += tagStart + "/>"; 
-        }else{ 
-            //TODO: node with only text value should not parse the text value in next line
-            xmlStr += tagStart + `>${tagValue}${indentation}</${tagName}>` ;
+        let newIdentation = indentation;
+        if (newIdentation !== "") {
+            newIdentation += options.indentBy;
         }
+        const attStr = attr_to_str(tagObj[":@"], options);
+        const tagStart = indentation + `<${tagName}${attStr}`;
+        const tagValue = arrToStr(tagObj[tagName], options, newJPath, newIdentation);
+        if (options.unpairedTags.indexOf(tagName) !== -1) {
+            if (options.suppressUnpairedNode) xmlStr += tagStart + ">";
+            else xmlStr += tagStart + "/>";
+        } else if ((!tagValue || tagValue.length === 0) && options.suppressEmptyNode) {
+            xmlStr += tagStart + "/>";
+        } else if (tagValue && tagValue.endsWith(">")) {
+            xmlStr += tagStart + `>${tagValue}${indentation}</${tagName}>`;
+        } else {
+            xmlStr += tagStart + ">";
+            if (tagValue && indentation !== "" && (tagValue.includes("/>") || tagValue.includes("</"))) {
+                xmlStr += indentation + options.indentBy + tagValue + indentation;
+            } else {
+                xmlStr += tagValue;
+            }
+            xmlStr += `</${tagName}>`;
+        }
+        isPreviousElementTag = true;
     }
-    
+
     return xmlStr;
 }
 
-function propName(obj){
+function propName(obj) {
     const keys = Object.keys(obj);
     for (let i = 0; i < keys.length; i++) {
-      const key = keys[i];
-      if(key !== ":@") return key;
+        const key = keys[i];
+        if (key !== ":@") return key;
     }
-  }
+}
 
-function attr_to_str(attrMap, options){
+function attr_to_str(attrMap, options) {
     let attrStr = "";
-    if(attrMap && !options.ignoreAttributes){
-        for (let attr in attrMap){
+    if (attrMap && !options.ignoreAttributes) {
+        for (let attr in attrMap) {
             let attrVal = options.attributeValueProcessor(attr, attrMap[attr]);
             attrVal = replaceEntitiesValue(attrVal, options);
-            if(attrVal === true && options.suppressBooleanAttributes){
-                attrStr+= ` ${attr.substr(options.attributeNamePrefix.length)}`;
-            }else{
-                attrStr+= ` ${attr.substr(options.attributeNamePrefix.length)}="${attrVal}"`;
+            if (attrVal === true && options.suppressBooleanAttributes) {
+                attrStr += ` ${attr.substr(options.attributeNamePrefix.length)}`;
+            } else {
+                attrStr += ` ${attr.substr(options.attributeNamePrefix.length)}="${attrVal}"`;
             }
         }
     }
     return attrStr;
 }
 
-function isStopNode(jPath, options){
-    jPath = jPath.substr(0,jPath.length - options.textNodeName.length - 1);
+function isStopNode(jPath, options) {
+    jPath = jPath.substr(0, jPath.length - options.textNodeName.length - 1);
     let tagName = jPath.substr(jPath.lastIndexOf(".") + 1);
-    for(let index in options.stopNodes){
-        if(options.stopNodes[index] === jPath || options.stopNodes[index] === "*."+tagName) return true;
+    for (let index in options.stopNodes) {
+        if (options.stopNodes[index] === jPath || options.stopNodes[index] === "*." + tagName) return true;
     }
     return false;
 }
 
-function replaceEntitiesValue(textValue, options){
-    if(textValue && textValue.length > 0 && options.processEntities){
-      for (let i=0; i< options.entities.length; i++) {
-        const entity = options.entities[i];
-        textValue = textValue.replace(entity.regex, entity.val);
-      }
+function replaceEntitiesValue(textValue, options) {
+    if (textValue && textValue.length > 0 && options.processEntities) {
+        for (let i = 0; i < options.entities.length; i++) {
+            const entity = options.entities[i];
+            textValue = textValue.replace(entity.regex, entity.val);
+        }
     }
     return textValue;
-  }
+}
 module.exports = toXml;
+
 
 /***/ }),
 
@@ -7137,56 +7255,36 @@ function readDocType(xmlData, i){
     {    
         i = i+9;
         let angleBracketsCount = 1;
-        let hasBody = false, entity = false, comment = false;
+        let hasBody = false, comment = false;
         let exp = "";
         for(;i<xmlData.length;i++){
-            if (xmlData[i] === '<') {
-                if( hasBody && 
-                     xmlData[i+1] === '!' &&
-                     xmlData[i+2] === 'E' &&
-                     xmlData[i+3] === 'N' &&
-                     xmlData[i+4] === 'T' &&
-                     xmlData[i+5] === 'I' &&
-                     xmlData[i+6] === 'T' &&
-                     xmlData[i+7] === 'Y'
-                ){
-                    i += 7;
-                    entity = true;
-                }else if( hasBody && 
-                    xmlData[i+1] === '!' &&
-                     xmlData[i+2] === 'E' &&
-                     xmlData[i+3] === 'L' &&
-                     xmlData[i+4] === 'E' &&
-                     xmlData[i+5] === 'M' &&
-                     xmlData[i+6] === 'E' &&
-                     xmlData[i+7] === 'N' &&
-                     xmlData[i+8] === 'T'
-                ){
-                    //Not supported
-                    i += 8;
-                }else if( //comment
-                    xmlData[i+1] === '!' &&
-                    xmlData[i+2] === '-' &&
-                    xmlData[i+3] === '-'
-                ){
-                    comment = true;
-                }else{
-                    throw new Error("Invalid DOCTYPE");
+            if (xmlData[i] === '<' && !comment) { //Determine the tag type
+                if( hasBody && isEntity(xmlData, i)){
+                    i += 7; 
+                    [entityName, val,i] = readEntityExp(xmlData,i+1);
+                    if(val.indexOf("&") === -1) //Parameter entities are not supported
+                        entities[ entityName ] = {
+                            regx : RegExp( `&${entityName};`,"g"),
+                            val: val
+                        };
                 }
+                else if( hasBody && isElement(xmlData, i))  i += 8;//Not supported
+                else if( hasBody && isAttlist(xmlData, i))  i += 8;//Not supported
+                else if( hasBody && isNotation(xmlData, i)) i += 9;//Not supported
+                else if( isComment)                         comment = true;
+                else                                        throw new Error("Invalid DOCTYPE");
+
                 angleBracketsCount++;
                 exp = "";
-            } else if (xmlData[i] === '>') {
+            } else if (xmlData[i] === '>') { //Read tag content
                 if(comment){
                     if( xmlData[i - 1] === "-" && xmlData[i - 2] === "-"){
                         comment = false;
-                    }else{
-                        throw new Error(`Invalid XML comment in DOCTYPE`);
+                        angleBracketsCount--;
                     }
-                }else if(entity){
-                    parseEntityExp(exp, entities);
-                    entity = false;
+                }else{
+                    angleBracketsCount--;
                 }
-                angleBracketsCount--;
                 if (angleBracketsCount === 0) {
                   break;
                 }
@@ -7205,16 +7303,87 @@ function readDocType(xmlData, i){
     return {entities, i};
 }
 
-const entityRegex = RegExp("^\\s([a-zA-z0-0]+)[ \t](['\"])([^&]+)\\2");
-function parseEntityExp(exp, entities){
-    const match = entityRegex.exec(exp);
-    if(match){
-        entities[ match[1] ] = {
-            regx : RegExp( `&${match[1]};`,"g"),
-            val: match[3]
-        };
+function readEntityExp(xmlData,i){
+    //External entities are not supported
+    //    <!ENTITY ext SYSTEM "http://normal-website.com" >
+
+    //Parameter entities are not supported
+    //    <!ENTITY entityname "&anotherElement;">
+
+    //Internal entities are supported
+    //    <!ENTITY entityname "replacement text">
+    
+    //read EntityName
+    let entityName = "";
+    for (; i < xmlData.length && (xmlData[i] !== "'" && xmlData[i] !== '"' ); i++) {
+        // if(xmlData[i] === " ") continue;
+        // else 
+        entityName += xmlData[i];
     }
+    entityName = entityName.trim();
+    if(entityName.indexOf(" ") !== -1) throw new Error("External entites are not supported");
+
+    //read Entity Value
+    const startChar = xmlData[i++];
+    let val = ""
+    for (; i < xmlData.length && xmlData[i] !== startChar ; i++) {
+        val += xmlData[i];
+    }
+    return [entityName, val, i];
 }
+
+function isComment(xmlData, i){
+    if(xmlData[i+1] === '!' &&
+    xmlData[i+2] === '-' &&
+    xmlData[i+3] === '-') return true
+    return false
+}
+function isEntity(xmlData, i){
+    if(xmlData[i+1] === '!' &&
+    xmlData[i+2] === 'E' &&
+    xmlData[i+3] === 'N' &&
+    xmlData[i+4] === 'T' &&
+    xmlData[i+5] === 'I' &&
+    xmlData[i+6] === 'T' &&
+    xmlData[i+7] === 'Y') return true
+    return false
+}
+function isElement(xmlData, i){
+    if(xmlData[i+1] === '!' &&
+    xmlData[i+2] === 'E' &&
+    xmlData[i+3] === 'L' &&
+    xmlData[i+4] === 'E' &&
+    xmlData[i+5] === 'M' &&
+    xmlData[i+6] === 'E' &&
+    xmlData[i+7] === 'N' &&
+    xmlData[i+8] === 'T') return true
+    return false
+}
+
+function isAttlist(xmlData, i){
+    if(xmlData[i+1] === '!' &&
+    xmlData[i+2] === 'A' &&
+    xmlData[i+3] === 'T' &&
+    xmlData[i+4] === 'T' &&
+    xmlData[i+5] === 'L' &&
+    xmlData[i+6] === 'I' &&
+    xmlData[i+7] === 'S' &&
+    xmlData[i+8] === 'T') return true
+    return false
+}
+function isNotation(xmlData, i){
+    if(xmlData[i+1] === '!' &&
+    xmlData[i+2] === 'N' &&
+    xmlData[i+3] === 'O' &&
+    xmlData[i+4] === 'T' &&
+    xmlData[i+5] === 'A' &&
+    xmlData[i+6] === 'T' &&
+    xmlData[i+7] === 'I' &&
+    xmlData[i+8] === 'O' &&
+    xmlData[i+9] === 'N') return true
+    return false
+}
+
 module.exports = readDocType;
 
 /***/ }),
@@ -7238,7 +7407,8 @@ const defaultOptions = {
     cdataPropName: false,
     numberParseOptions: {
       hex: true,
-      leadingZeros: true
+      leadingZeros: true,
+      eNotation: true
     },
     tagValueProcessor: function(tagName, val) {
       return val;
@@ -7254,7 +7424,9 @@ const defaultOptions = {
     processEntities: true,
     htmlEntities: false,
     ignoreDeclaration: false,
-    ignorePiTags: false
+    ignorePiTags: false,
+    transformTagName: false,
+    transformAttributeName: false,
 };
    
 const buildOptions = function(options) {
@@ -7292,12 +7464,12 @@ class OrderedObjParser{
     this.tagsNodeStack = [];
     this.docTypeEntities = {};
     this.lastEntities = {
-      "amp" : { regex: /&(amp|#38|#x26);/g, val : "&"},
       "apos" : { regex: /&(apos|#39|#x27);/g, val : "'"},
       "gt" : { regex: /&(gt|#62|#x3E);/g, val : ">"},
       "lt" : { regex: /&(lt|#60|#x3C);/g, val : "<"},
       "quot" : { regex: /&(quot|#34|#x22);/g, val : "\""},
     };
+    this.ampEntity = { regex: /&(amp|#38|#x26);/g, val : "&"};
     this.htmlEntities = {
       "space": { regex: /&(nbsp|#160);/g, val: " " },
       // "lt" : { regex: /&(lt|#60);/g, val: "<" },
@@ -7404,8 +7576,12 @@ function buildAttributesMap(attrStr, jPath) {
     for (let i = 0; i < len; i++) {
       const attrName = this.resolveNameSpace(matches[i][1]);
       let oldVal = matches[i][4];
-      const aName = this.options.attributeNamePrefix + attrName;
+      let aName = this.options.attributeNamePrefix + attrName;
       if (attrName.length) {
+        if (this.options.transformAttributeName) {
+          aName = this.options.transformAttributeName(aName);
+        }
+        if(aName === "__proto__") aName  = "#__proto__";
         if (oldVal !== undefined) {
           if (this.options.trimValues) {
             oldVal = oldVal.trim();
@@ -7463,6 +7639,10 @@ const parseXml = function(xmlData) {
           if(colonIndex !== -1){
             tagName = tagName.substr(colonIndex+1);
           }
+        }
+
+        if(this.options.transformTagName) {
+          tagName = this.options.transformTagName(tagName);
         }
 
         if(currentNode){
@@ -7523,18 +7703,21 @@ const parseXml = function(xmlData) {
           currentNode.add(this.options.cdataPropName, [ { [this.options.textNodeName] : tagExp } ]);
         }else{
           let val = this.parseTextData(tagExp, currentNode.tagname, jPath, true, false, true);
-          if(!val) val = "";
+          if(val == undefined) val = "";
           currentNode.add(this.options.textNodeName, val);
         }
         
         i = closeIndex + 2;
       }else {//Opening tag
-       
-        let result = readTagExp(xmlData,i, this. options.removeNSPrefix);
+        let result = readTagExp(xmlData,i, this.options.removeNSPrefix);
         let tagName= result.tagName;
         let tagExp = result.tagExp;
         let attrExpPresent = result.attrExpPresent;
         let closeIndex = result.closeIndex;
+
+        if (this.options.transformTagName) {
+          tagName = this.options.transformTagName(tagName);
+        }
         
         //save text as child node
         if (currentNode && textData) {
@@ -7594,6 +7777,10 @@ const parseXml = function(xmlData) {
             }else{
               tagExp = tagExp.substr(0, tagExp.length - 1);
             }
+            
+            if(this.options.transformTagName) {
+              tagName = this.options.transformTagName(tagName);
+            }
 
             const childNode = new xmlNode(tagName);
             if(tagName !== tagExp && attrExpPresent){
@@ -7625,6 +7812,7 @@ const parseXml = function(xmlData) {
 }
 
 const replaceEntitiesValue = function(val){
+
   if(this.options.processEntities){
     for(let entityName in this.docTypeEntities){
       const entity = this.docTypeEntities[entityName];
@@ -7640,6 +7828,7 @@ const replaceEntitiesValue = function(val){
         val = val.replace( entity.regex, entity.val);
       }
     }
+    val = val.replace( this.ampEntity.regex, this.ampEntity.val);
   }
   return val;
 }
@@ -7758,17 +7947,44 @@ function readTagExp(xmlData,i, removeNSPrefix, closingChar = ">"){
  */
 function readStopNodeData(xmlData, tagName, i){
   const startIndex = i;
+  // Starting at 1 since we already have an open tag
+  let openTagCount = 1;
+
   for (; i < xmlData.length; i++) {
-    if( xmlData[i] === "<" && xmlData[i+1] === "/"){ 
-        const closeIndex = findClosingIndex(xmlData, ">", i, `${tagName} is not closed`);
-        let closeTagName = xmlData.substring(i+2,closeIndex).trim();
-        if(closeTagName === tagName){
-          return {
-            tagContent: xmlData.substring(startIndex, i),
-            i : closeIndex
+    if( xmlData[i] === "<"){ 
+      if (xmlData[i+1] === "/") {//close tag
+          const closeIndex = findClosingIndex(xmlData, ">", i, `${tagName} is not closed`);
+          let closeTagName = xmlData.substring(i+2,closeIndex).trim();
+          if(closeTagName === tagName){
+            openTagCount--;
+            if (openTagCount === 0) {
+              return {
+                tagContent: xmlData.substring(startIndex, i),
+                i : closeIndex
+              }
+            }
+          }
+          i=closeIndex;
+        } else if(xmlData[i+1] === '?') { 
+          const closeIndex = findClosingIndex(xmlData, "?>", i+1, "StopNode is not closed.")
+          i=closeIndex;
+        } else if(xmlData.substr(i + 1, 3) === '!--') { 
+          const closeIndex = findClosingIndex(xmlData, "-->", i+3, "StopNode is not closed.")
+          i=closeIndex;
+        } else if(xmlData.substr(i + 1, 2) === '![') { 
+          const closeIndex = findClosingIndex(xmlData, "]]>", i, "StopNode is not closed.") - 2;
+          i=closeIndex;
+        } else {
+          const tagData = readTagExp(xmlData, i, '>')
+
+          if (tagData) {
+            const openTagName = tagData && tagData.tagName;
+            if (openTagName === tagName && tagData.tagExp[tagData.tagExp.length-1] !== "/") {
+              openTagCount++;
+            }
+            i=tagData.closeIndex;
           }
         }
-        i=closeIndex;
       }
   }//end for loop
 }
@@ -7847,6 +8063,8 @@ class XMLParser{
             throw new Error("Entity value can't have '&'")
         }else if(key.indexOf("&") !== -1 || key.indexOf(";") !== -1){
             throw new Error("An entity must be set without '&' and ';'. Eg. use '#xD' for '&#xD;'")
+        }else if(value === "&"){
+            throw new Error("An entity with value '&' is not permitted");
         }else{
             this.externalEntities[key] = value;
         }
@@ -7909,9 +8127,9 @@ function compress(arr, options, jPath){
         else val = "";
       }
 
-      if(compressedObj[property] !== undefined) {
+      if(compressedObj[property] !== undefined && compressedObj.hasOwnProperty(property)) {
         if(!Array.isArray(compressedObj[property])) {
-          compressedObj[property] = [ compressedObj[property] ];
+            compressedObj[property] = [ compressedObj[property] ];
         }
         compressedObj[property].push(val);
       }else{
@@ -7980,9 +8198,11 @@ class XmlNode{
   }
   add(key,val){
     // this.child.push( {name : key, val: val, isCdata: isCdata });
+    if(key === "__proto__") key = "#__proto__";
     this.child.push( {[key]: val });
   }
   addChild(node) {
+    if(node.tagname === "__proto__") node.tagname = "#__proto__";
     if(node[":@"] && Object.keys(node[":@"]).length > 0){
       this.child.push( { [node.tagname]: node.child, [":@"]: node[":@"] });
     }else{
@@ -13346,6 +13566,652 @@ function getUserAgent() {
 exports.getUserAgent = getUserAgent;
 //# sourceMappingURL=index.js.map
 
+
+/***/ }),
+
+/***/ 5840:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+Object.defineProperty(exports, "v1", ({
+  enumerable: true,
+  get: function () {
+    return _v.default;
+  }
+}));
+Object.defineProperty(exports, "v3", ({
+  enumerable: true,
+  get: function () {
+    return _v2.default;
+  }
+}));
+Object.defineProperty(exports, "v4", ({
+  enumerable: true,
+  get: function () {
+    return _v3.default;
+  }
+}));
+Object.defineProperty(exports, "v5", ({
+  enumerable: true,
+  get: function () {
+    return _v4.default;
+  }
+}));
+Object.defineProperty(exports, "NIL", ({
+  enumerable: true,
+  get: function () {
+    return _nil.default;
+  }
+}));
+Object.defineProperty(exports, "version", ({
+  enumerable: true,
+  get: function () {
+    return _version.default;
+  }
+}));
+Object.defineProperty(exports, "validate", ({
+  enumerable: true,
+  get: function () {
+    return _validate.default;
+  }
+}));
+Object.defineProperty(exports, "stringify", ({
+  enumerable: true,
+  get: function () {
+    return _stringify.default;
+  }
+}));
+Object.defineProperty(exports, "parse", ({
+  enumerable: true,
+  get: function () {
+    return _parse.default;
+  }
+}));
+
+var _v = _interopRequireDefault(__nccwpck_require__(8628));
+
+var _v2 = _interopRequireDefault(__nccwpck_require__(6409));
+
+var _v3 = _interopRequireDefault(__nccwpck_require__(5122));
+
+var _v4 = _interopRequireDefault(__nccwpck_require__(9120));
+
+var _nil = _interopRequireDefault(__nccwpck_require__(5332));
+
+var _version = _interopRequireDefault(__nccwpck_require__(1595));
+
+var _validate = _interopRequireDefault(__nccwpck_require__(6900));
+
+var _stringify = _interopRequireDefault(__nccwpck_require__(8950));
+
+var _parse = _interopRequireDefault(__nccwpck_require__(2746));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+
+/***/ 4569:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+
+var _crypto = _interopRequireDefault(__nccwpck_require__(6113));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function md5(bytes) {
+  if (Array.isArray(bytes)) {
+    bytes = Buffer.from(bytes);
+  } else if (typeof bytes === 'string') {
+    bytes = Buffer.from(bytes, 'utf8');
+  }
+
+  return _crypto.default.createHash('md5').update(bytes).digest();
+}
+
+var _default = md5;
+exports["default"] = _default;
+
+/***/ }),
+
+/***/ 5332:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+var _default = '00000000-0000-0000-0000-000000000000';
+exports["default"] = _default;
+
+/***/ }),
+
+/***/ 2746:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+
+var _validate = _interopRequireDefault(__nccwpck_require__(6900));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function parse(uuid) {
+  if (!(0, _validate.default)(uuid)) {
+    throw TypeError('Invalid UUID');
+  }
+
+  let v;
+  const arr = new Uint8Array(16); // Parse ########-....-....-....-............
+
+  arr[0] = (v = parseInt(uuid.slice(0, 8), 16)) >>> 24;
+  arr[1] = v >>> 16 & 0xff;
+  arr[2] = v >>> 8 & 0xff;
+  arr[3] = v & 0xff; // Parse ........-####-....-....-............
+
+  arr[4] = (v = parseInt(uuid.slice(9, 13), 16)) >>> 8;
+  arr[5] = v & 0xff; // Parse ........-....-####-....-............
+
+  arr[6] = (v = parseInt(uuid.slice(14, 18), 16)) >>> 8;
+  arr[7] = v & 0xff; // Parse ........-....-....-####-............
+
+  arr[8] = (v = parseInt(uuid.slice(19, 23), 16)) >>> 8;
+  arr[9] = v & 0xff; // Parse ........-....-....-....-############
+  // (Use "/" to avoid 32-bit truncation when bit-shifting high-order bytes)
+
+  arr[10] = (v = parseInt(uuid.slice(24, 36), 16)) / 0x10000000000 & 0xff;
+  arr[11] = v / 0x100000000 & 0xff;
+  arr[12] = v >>> 24 & 0xff;
+  arr[13] = v >>> 16 & 0xff;
+  arr[14] = v >>> 8 & 0xff;
+  arr[15] = v & 0xff;
+  return arr;
+}
+
+var _default = parse;
+exports["default"] = _default;
+
+/***/ }),
+
+/***/ 814:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+var _default = /^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i;
+exports["default"] = _default;
+
+/***/ }),
+
+/***/ 807:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = rng;
+
+var _crypto = _interopRequireDefault(__nccwpck_require__(6113));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const rnds8Pool = new Uint8Array(256); // # of random values to pre-allocate
+
+let poolPtr = rnds8Pool.length;
+
+function rng() {
+  if (poolPtr > rnds8Pool.length - 16) {
+    _crypto.default.randomFillSync(rnds8Pool);
+
+    poolPtr = 0;
+  }
+
+  return rnds8Pool.slice(poolPtr, poolPtr += 16);
+}
+
+/***/ }),
+
+/***/ 5274:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+
+var _crypto = _interopRequireDefault(__nccwpck_require__(6113));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function sha1(bytes) {
+  if (Array.isArray(bytes)) {
+    bytes = Buffer.from(bytes);
+  } else if (typeof bytes === 'string') {
+    bytes = Buffer.from(bytes, 'utf8');
+  }
+
+  return _crypto.default.createHash('sha1').update(bytes).digest();
+}
+
+var _default = sha1;
+exports["default"] = _default;
+
+/***/ }),
+
+/***/ 8950:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+
+var _validate = _interopRequireDefault(__nccwpck_require__(6900));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Convert array of 16 byte values to UUID string format of the form:
+ * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+ */
+const byteToHex = [];
+
+for (let i = 0; i < 256; ++i) {
+  byteToHex.push((i + 0x100).toString(16).substr(1));
+}
+
+function stringify(arr, offset = 0) {
+  // Note: Be careful editing this code!  It's been tuned for performance
+  // and works in ways you may not expect. See https://github.com/uuidjs/uuid/pull/434
+  const uuid = (byteToHex[arr[offset + 0]] + byteToHex[arr[offset + 1]] + byteToHex[arr[offset + 2]] + byteToHex[arr[offset + 3]] + '-' + byteToHex[arr[offset + 4]] + byteToHex[arr[offset + 5]] + '-' + byteToHex[arr[offset + 6]] + byteToHex[arr[offset + 7]] + '-' + byteToHex[arr[offset + 8]] + byteToHex[arr[offset + 9]] + '-' + byteToHex[arr[offset + 10]] + byteToHex[arr[offset + 11]] + byteToHex[arr[offset + 12]] + byteToHex[arr[offset + 13]] + byteToHex[arr[offset + 14]] + byteToHex[arr[offset + 15]]).toLowerCase(); // Consistency check for valid UUID.  If this throws, it's likely due to one
+  // of the following:
+  // - One or more input array values don't map to a hex octet (leading to
+  // "undefined" in the uuid)
+  // - Invalid input values for the RFC `version` or `variant` fields
+
+  if (!(0, _validate.default)(uuid)) {
+    throw TypeError('Stringified UUID is invalid');
+  }
+
+  return uuid;
+}
+
+var _default = stringify;
+exports["default"] = _default;
+
+/***/ }),
+
+/***/ 8628:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+
+var _rng = _interopRequireDefault(__nccwpck_require__(807));
+
+var _stringify = _interopRequireDefault(__nccwpck_require__(8950));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// **`v1()` - Generate time-based UUID**
+//
+// Inspired by https://github.com/LiosK/UUID.js
+// and http://docs.python.org/library/uuid.html
+let _nodeId;
+
+let _clockseq; // Previous uuid creation time
+
+
+let _lastMSecs = 0;
+let _lastNSecs = 0; // See https://github.com/uuidjs/uuid for API details
+
+function v1(options, buf, offset) {
+  let i = buf && offset || 0;
+  const b = buf || new Array(16);
+  options = options || {};
+  let node = options.node || _nodeId;
+  let clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq; // node and clockseq need to be initialized to random values if they're not
+  // specified.  We do this lazily to minimize issues related to insufficient
+  // system entropy.  See #189
+
+  if (node == null || clockseq == null) {
+    const seedBytes = options.random || (options.rng || _rng.default)();
+
+    if (node == null) {
+      // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
+      node = _nodeId = [seedBytes[0] | 0x01, seedBytes[1], seedBytes[2], seedBytes[3], seedBytes[4], seedBytes[5]];
+    }
+
+    if (clockseq == null) {
+      // Per 4.2.2, randomize (14 bit) clockseq
+      clockseq = _clockseq = (seedBytes[6] << 8 | seedBytes[7]) & 0x3fff;
+    }
+  } // UUID timestamps are 100 nano-second units since the Gregorian epoch,
+  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
+  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
+  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
+
+
+  let msecs = options.msecs !== undefined ? options.msecs : Date.now(); // Per 4.2.1.2, use count of uuid's generated during the current clock
+  // cycle to simulate higher resolution clock
+
+  let nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1; // Time since last uuid creation (in msecs)
+
+  const dt = msecs - _lastMSecs + (nsecs - _lastNSecs) / 10000; // Per 4.2.1.2, Bump clockseq on clock regression
+
+  if (dt < 0 && options.clockseq === undefined) {
+    clockseq = clockseq + 1 & 0x3fff;
+  } // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
+  // time interval
+
+
+  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
+    nsecs = 0;
+  } // Per 4.2.1.2 Throw error if too many uuids are requested
+
+
+  if (nsecs >= 10000) {
+    throw new Error("uuid.v1(): Can't create more than 10M uuids/sec");
+  }
+
+  _lastMSecs = msecs;
+  _lastNSecs = nsecs;
+  _clockseq = clockseq; // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
+
+  msecs += 12219292800000; // `time_low`
+
+  const tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
+  b[i++] = tl >>> 24 & 0xff;
+  b[i++] = tl >>> 16 & 0xff;
+  b[i++] = tl >>> 8 & 0xff;
+  b[i++] = tl & 0xff; // `time_mid`
+
+  const tmh = msecs / 0x100000000 * 10000 & 0xfffffff;
+  b[i++] = tmh >>> 8 & 0xff;
+  b[i++] = tmh & 0xff; // `time_high_and_version`
+
+  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
+
+  b[i++] = tmh >>> 16 & 0xff; // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
+
+  b[i++] = clockseq >>> 8 | 0x80; // `clock_seq_low`
+
+  b[i++] = clockseq & 0xff; // `node`
+
+  for (let n = 0; n < 6; ++n) {
+    b[i + n] = node[n];
+  }
+
+  return buf || (0, _stringify.default)(b);
+}
+
+var _default = v1;
+exports["default"] = _default;
+
+/***/ }),
+
+/***/ 6409:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+
+var _v = _interopRequireDefault(__nccwpck_require__(5998));
+
+var _md = _interopRequireDefault(__nccwpck_require__(4569));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const v3 = (0, _v.default)('v3', 0x30, _md.default);
+var _default = v3;
+exports["default"] = _default;
+
+/***/ }),
+
+/***/ 5998:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = _default;
+exports.URL = exports.DNS = void 0;
+
+var _stringify = _interopRequireDefault(__nccwpck_require__(8950));
+
+var _parse = _interopRequireDefault(__nccwpck_require__(2746));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function stringToBytes(str) {
+  str = unescape(encodeURIComponent(str)); // UTF8 escape
+
+  const bytes = [];
+
+  for (let i = 0; i < str.length; ++i) {
+    bytes.push(str.charCodeAt(i));
+  }
+
+  return bytes;
+}
+
+const DNS = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
+exports.DNS = DNS;
+const URL = '6ba7b811-9dad-11d1-80b4-00c04fd430c8';
+exports.URL = URL;
+
+function _default(name, version, hashfunc) {
+  function generateUUID(value, namespace, buf, offset) {
+    if (typeof value === 'string') {
+      value = stringToBytes(value);
+    }
+
+    if (typeof namespace === 'string') {
+      namespace = (0, _parse.default)(namespace);
+    }
+
+    if (namespace.length !== 16) {
+      throw TypeError('Namespace must be array-like (16 iterable integer values, 0-255)');
+    } // Compute hash of namespace and value, Per 4.3
+    // Future: Use spread syntax when supported on all platforms, e.g. `bytes =
+    // hashfunc([...namespace, ... value])`
+
+
+    let bytes = new Uint8Array(16 + value.length);
+    bytes.set(namespace);
+    bytes.set(value, namespace.length);
+    bytes = hashfunc(bytes);
+    bytes[6] = bytes[6] & 0x0f | version;
+    bytes[8] = bytes[8] & 0x3f | 0x80;
+
+    if (buf) {
+      offset = offset || 0;
+
+      for (let i = 0; i < 16; ++i) {
+        buf[offset + i] = bytes[i];
+      }
+
+      return buf;
+    }
+
+    return (0, _stringify.default)(bytes);
+  } // Function#name is not settable on some platforms (#270)
+
+
+  try {
+    generateUUID.name = name; // eslint-disable-next-line no-empty
+  } catch (err) {} // For CommonJS default export support
+
+
+  generateUUID.DNS = DNS;
+  generateUUID.URL = URL;
+  return generateUUID;
+}
+
+/***/ }),
+
+/***/ 5122:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+
+var _rng = _interopRequireDefault(__nccwpck_require__(807));
+
+var _stringify = _interopRequireDefault(__nccwpck_require__(8950));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function v4(options, buf, offset) {
+  options = options || {};
+
+  const rnds = options.random || (options.rng || _rng.default)(); // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+
+
+  rnds[6] = rnds[6] & 0x0f | 0x40;
+  rnds[8] = rnds[8] & 0x3f | 0x80; // Copy bytes to buffer, if provided
+
+  if (buf) {
+    offset = offset || 0;
+
+    for (let i = 0; i < 16; ++i) {
+      buf[offset + i] = rnds[i];
+    }
+
+    return buf;
+  }
+
+  return (0, _stringify.default)(rnds);
+}
+
+var _default = v4;
+exports["default"] = _default;
+
+/***/ }),
+
+/***/ 9120:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+
+var _v = _interopRequireDefault(__nccwpck_require__(5998));
+
+var _sha = _interopRequireDefault(__nccwpck_require__(5274));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const v5 = (0, _v.default)('v5', 0x50, _sha.default);
+var _default = v5;
+exports["default"] = _default;
+
+/***/ }),
+
+/***/ 6900:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+
+var _regex = _interopRequireDefault(__nccwpck_require__(814));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function validate(uuid) {
+  return typeof uuid === 'string' && _regex.default.test(uuid);
+}
+
+var _default = validate;
+exports["default"] = _default;
+
+/***/ }),
+
+/***/ 1595:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+
+var _validate = _interopRequireDefault(__nccwpck_require__(6900));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function version(uuid) {
+  if (!(0, _validate.default)(uuid)) {
+    throw TypeError('Invalid UUID');
+  }
+
+  return parseInt(uuid.substr(14, 1), 16);
+}
+
+var _default = version;
+exports["default"] = _default;
 
 /***/ }),
 
